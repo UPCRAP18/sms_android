@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/transparent"
+    app:bbn_badgeColor="#FFFF0000"
+    app:bbn_rippleColor="@color/orange_light_material">
+    <item
+        android:id="@+id/btnHome"
+        android:color="@color/light_gray_material"
+        android:icon="@drawable/home_nav"
+        android:title="@string/nb_home" />
+    <item
+        android:id="@+id/btnStats"
+        android:color="@color/light_gray_material"
+        android:icon="@drawable/stadistics_nav"
+        android:title="@string/nb_estadisticas" />
+    <item
+        android:id="@+id/btnPerfil"
+        android:color="@color/light_gray_material"
+        android:icon="@drawable/user_nav"
+        android:title="@string/nb_perfil" />
+</menu>

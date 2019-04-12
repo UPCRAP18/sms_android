@@ -9,6 +9,7 @@
     <color name="indigo_material">#1a237e</color>
     <color name="orange_light_material">#FFCCBC</color>
     <color name="red_material">#c62828</color>
+    <color name="light_gray_material">#e0e0e0</color>
 
     <color name="black_overlay">#66000000</color>
 

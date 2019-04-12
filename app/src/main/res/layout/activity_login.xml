@@ -45,21 +45,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <Button
-                    android:id="@+id/btnReset"
-                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_margin="8dp"
-                    android:gravity="center|end"
-                    android:text="@string/btnResetPwd"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@color/blue_material"
-                    android:textColorHighlight="@color/orange_light_material"
-                    android:textSize="14sp" />
-
 
                 <ImageView
                     android:id="@+id/imgLogo"
@@ -70,38 +55,6 @@
                     app:srcCompat="@drawable/logo"
                     tools:ignore="ContentDescription"
                     tools:layout_editor_absoluteX="172dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/btnLogin"
-                        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/andika"
-                        android:text="@string/btnLogin"
-                        android:textAlignment="center"
-                        android:textColor="@color/indigo_material"
-                        android:textSize="16sp" />
-
-                    <Button
-                        android:id="@+id/btnRegister"
-                        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/andika"
-                        android:text="@string/btnRegister"
-                        android:textAlignment="center"
-                        android:textColor="@color/indigo_material"
-                        android:textSize="16sp" />
-                </LinearLayout>
 
                 <Space
                     android:layout_width="match_parent"
@@ -152,6 +105,53 @@
                     android:textSize="18sp"
                     app:met_floatingLabel="highlight"
                     app:met_floatingLabelTextColor="@color/purple_material" />
+
+                <Button
+                    android:id="@+id/btnReset"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_margin="8dp"
+                    android:gravity="center|end"
+                    android:text="@string/btnResetPwd"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/blue_material"
+                    android:textColorHighlight="@color/orange_light_material"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnLogin"
+                        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/andika"
+                        android:text="@string/btnLogin"
+                        android:textAlignment="center"
+                        android:textColor="@color/indigo_material"
+                        android:textSize="16sp" />
+
+                    <Button
+                        android:id="@+id/btnRegister"
+                        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/andika"
+                        android:text="@string/btnRegister"
+                        android:textAlignment="center"
+                        android:textColor="@color/indigo_material"
+                        android:textSize="16sp" />
+                </LinearLayout>
 
 
             </LinearLayout>

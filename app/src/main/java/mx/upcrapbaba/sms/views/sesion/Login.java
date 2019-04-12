@@ -16,6 +16,8 @@ import es.dmoral.toasty.Toasty;
 import mx.upcrapbaba.sms.API.ApiWeb;
 import mx.upcrapbaba.sms.API.Service.SMSService;
 import mx.upcrapbaba.sms.R;
+import mx.upcrapbaba.sms.sqlite.DBHelper;
+import mx.upcrapbaba.sms.views.inicio.Inicio;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -29,6 +31,13 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (checkIfUserExists()) {
+            startActivity(new Intent(this, Inicio.class));
+            overridePendingTransition(0, 0);
+            this.finish();
+        }
+
         setContentView(R.layout.activity_login);
         Button btnRegister = findViewById(R.id.btnRegister);
         Button btnLogin = findViewById(R.id.btnLogin);
@@ -39,8 +48,6 @@ public class Login extends AppCompatActivity {
 
         //Se crea el servicio para poder hacer las request
         sms_service = ApiWeb.getApi(new ApiWeb().getBASE_URL_GLITCH()).create(SMSService.class);
-
-        //TODO Validar si ya existe un usuario activo
 
         btnRegister.setOnClickListener(v -> {
             startActivity(new Intent(this, Register.class));
@@ -67,7 +74,17 @@ public class Login extends AppCompatActivity {
                         if (response.isSuccessful() && response.body() != null) {
                             Toasty.success(Login.this, response.body().get("message").toString()).show();
                             System.out.println("Se ha iniciado sesion correctamente");
-                            //TODO Guardar los datos en la base de datos
+
+                            DBHelper dbHelper = new DBHelper(Login.this);
+
+                            if (dbHelper.addCredentials(response.body().get("id").toString(), response.body().get("token").toString())) {
+                                startActivity(new Intent(Login.this, Inicio.class));
+                                overridePendingTransition(0, 0);
+                                Login.this.finish();
+                            } else {
+                                Toasty.warning(Login.this, getResources().getString(R.string.error_db)).show();
+                            }
+
                         } else {
                             Toasty.error(Login.this, getResources().getString(R.string.creds_invalidas)).show();
                         }
@@ -99,6 +116,18 @@ public class Login extends AppCompatActivity {
     private boolean validateDataFields() {
         return (!Objects.requireNonNull(etUsuario.getText()).toString().isEmpty() &&
                 !Objects.requireNonNull(etPwd.getText()).toString().isEmpty());
+    }
+
+    /**
+     * Checa si existe un usuario en la base de datos
+     *
+     * @return True si es que existe el usuario
+     */
+    private boolean checkIfUserExists() {
+        DBHelper helper = new DBHelper(this);
+
+        return !helper.getData_Usuario().isEmpty();
+
     }
 
 }

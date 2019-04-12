@@ -12,6 +12,7 @@
     <string name="fields_error">No puede dejar los campos vacios</string>
     <string name="creds_invalidas">Las credenciales son invalidas</string>
     <string name="request_error">Ha ocurrido un error en la request</string>
+    <string name="error_db">Ha ocurrido un error al guardar los datos</string>
 
     <!-- Registro -->
     <string name="ht_nombre">Nombre</string>
@@ -20,6 +21,22 @@
     <string name="ht_matricula">Matricula de Empleado</string>
     <string name="btnRegresar">Regresar</string>
     <string name="error_usr_duplicate">El usuario ya existe</string>
+
+    <!-- Navigation Bar -->
+    <string name="nb_home">Inicio</string>
+    <string name="nb_estadisticas">Estadisticas</string>
+    <string name="nb_perfil">Perfil</string>
+
+
+    <!-- Pagina principal -->
+    <string name="lblAsignaturas">Asignaturas</string>
+
+    <string-array name="testing">
+        <item>Bla</item>
+        <item>Bla</item>
+        <item>Bla</item>
+        <item>Bla</item>
+    </string-array>
 
 
 </resources>

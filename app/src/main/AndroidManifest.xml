@@ -11,6 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
+        <activity android:name=".views.inicio.Inicio"></activity>
         <activity
             android:name=".views.splash.SplashScreen"
             android:theme="@style/SplashTheme">
@@ -23,9 +24,8 @@
         <activity android:name=".views.sesion.Register" />
         <activity android:name=".views.sesion.Login" />
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
