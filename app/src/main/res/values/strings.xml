@@ -1,3 +1,25 @@
 <resources>
-    <string name="app_name">Service Management Student</string>
+    <string name="app_name">SMS</string>
+    <string name="app_name_full">Service Management Student</string>
+
+    <!-- Inicio de Sesion-->
+    <!-- Login -->
+    <string name="ht_email">Email</string>
+    <string name="ht_pwd">Contraseña</string>
+    <string name="btnResetPwd">¿Has olvidado la contraseña?</string>
+    <string name="btnLogin">Iniciar Sesion</string>
+    <string name="btnRegister">Registrar</string>
+    <string name="fields_error">No puede dejar los campos vacios</string>
+    <string name="creds_invalidas">Las credenciales son invalidas</string>
+    <string name="request_error">Ha ocurrido un error en la request</string>
+
+    <!-- Registro -->
+    <string name="ht_nombre">Nombre</string>
+    <string name="ht_apellido_pat">Apellido Paterno</string>
+    <string name="ht_apellido_mat">Apellido Materno</string>
+    <string name="ht_matricula">Matricula de Empleado</string>
+    <string name="btnRegresar">Regresar</string>
+    <string name="error_usr_duplicate">El usuario ya existe</string>
+
+
 </resources>

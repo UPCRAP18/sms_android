@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background"
-    tools:context=".views.sesion.Login">
+    tools:context=".views.sesion.Register">
 
 
     <androidx.cardview.widget.CardView
@@ -45,22 +45,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <Button
-                    android:id="@+id/btnReset"
-                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_margin="8dp"
-                    android:gravity="center|end"
-                    android:text="@string/btnResetPwd"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@color/blue_material"
-                    android:textColorHighlight="@color/orange_light_material"
-                    android:textSize="14sp" />
-
-
                 <ImageView
                     android:id="@+id/imgLogo"
                     android:layout_width="140dp"
@@ -71,26 +55,28 @@
                     tools:ignore="ContentDescription"
                     tools:layout_editor_absoluteX="172dp" />
 
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_margin="8dp"
                     android:orientation="horizontal">
 
                     <Button
-                        android:id="@+id/btnLogin"
+                        android:id="@+id/btnBack"
                         style="@style/Widget.AppCompat.Button.Borderless.Colored"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
                         android:layout_weight="1"
                         android:fontFamily="@font/andika"
-                        android:text="@string/btnLogin"
+                        android:text="@string/btnRegresar"
                         android:textAlignment="center"
                         android:textColor="@color/indigo_material"
                         android:textSize="16sp" />
 
                     <Button
-                        android:id="@+id/btnRegister"
+                        android:id="@+id/btnRegistrar"
                         style="@style/Widget.AppCompat.Button.Borderless.Colored"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -105,28 +91,18 @@
 
                 <Space
                     android:layout_width="match_parent"
-                    android:layout_height="22dp" />
-
-                <TextView
-                    android:id="@+id/lblAppName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/amita"
-                    android:text="@string/app_name_full"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/black"
-                    android:textSize="24sp"
-                    android:textStyle="italic" />
+                    android:layout_height="16dp" />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
-                    android:id="@+id/etUsuario_Nombre"
+                    android:id="@+id/etUsuario_Apellido_Pat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
+                    android:layout_margin="4dp"
                     android:drawableStart="@drawable/user"
                     android:drawablePadding="12sp"
                     android:fontFamily="sans-serif-condensed"
-                    android:hint="@string/ht_email"
+                    android:hint="@string/ht_apellido_pat"
+                    android:inputType="text"
                     android:lines="1"
                     android:singleLine="true"
                     android:textColor="@android:color/black"
@@ -136,15 +112,87 @@
                     app:met_floatingLabelTextColor="@color/purple_material" />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
-                    android:id="@+id/etUsuario_Apellido_Pat"
+                    android:id="@+id/etUsuario_Apellido_Mat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
+                    android:layout_margin="4dp"
+                    android:drawableStart="@drawable/user"
+                    android:drawablePadding="12sp"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="@string/ht_apellido_mat"
+                    android:inputType="text"
+                    android:lines="1"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@android:color/darker_gray"
+                    android:textSize="18sp"
+                    app:met_floatingLabel="highlight"
+                    app:met_floatingLabelTextColor="@color/purple_material" />
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/etUsuario_Matricula"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:drawableStart="@drawable/id_card"
+                    android:drawablePadding="12sp"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="@string/ht_matricula"
+                    android:inputType="text"
+                    android:lines="1"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@android:color/darker_gray"
+                    android:textSize="18sp"
+                    app:met_floatingLabel="highlight"
+                    app:met_floatingLabelTextColor="@color/purple_material" />
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/etUsuario_Email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:drawableStart="@drawable/arroba"
+                    android:drawablePadding="12sp"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="@string/ht_email"
+                    android:inputType="textEmailAddress"
+                    android:lines="1"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@android:color/darker_gray"
+                    android:textSize="18sp"
+                    app:met_floatingLabel="highlight"
+                    app:met_floatingLabelTextColor="@color/purple_material" />
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/etUsuario_Pwd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
                     android:drawableStart="@drawable/key"
                     android:drawablePadding="12sp"
                     android:fontFamily="sans-serif-condensed"
                     android:hint="@string/ht_pwd"
                     android:inputType="textPassword"
+                    android:lines="1"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@android:color/darker_gray"
+                    android:textSize="18sp"
+                    app:met_floatingLabel="highlight"
+                    app:met_floatingLabelTextColor="@color/purple_material" />
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/etUsuario_Nombre"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:drawableStart="@drawable/user"
+                    android:drawablePadding="12sp"
+                    android:fontFamily="sans-serif-condensed"
+                    android:hint="@string/ht_nombre"
+                    android:inputType="text"
                     android:lines="1"
                     android:singleLine="true"
                     android:textColor="@android:color/black"
@@ -171,7 +219,9 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
