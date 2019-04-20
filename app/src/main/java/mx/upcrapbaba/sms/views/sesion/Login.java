@@ -13,9 +13,9 @@ import com.wang.avi.AVLoadingIndicatorView;
 import java.util.Objects;
 
 import es.dmoral.toasty.Toasty;
-import mx.upcrapbaba.sms.API.ApiWeb;
-import mx.upcrapbaba.sms.API.Service.SMSService;
 import mx.upcrapbaba.sms.R;
+import mx.upcrapbaba.sms.api.ApiWeb;
+import mx.upcrapbaba.sms.api.Service.SMSService;
 import mx.upcrapbaba.sms.sqlite.DBHelper;
 import mx.upcrapbaba.sms.views.inicio.Inicio;
 import retrofit2.Call;
@@ -42,8 +42,8 @@ public class Login extends AppCompatActivity {
         Button btnRegister = findViewById(R.id.btnRegister);
         Button btnLogin = findViewById(R.id.btnLogin);
         Button btnReset = findViewById(R.id.btnReset);
-        etUsuario = findViewById(R.id.etUsuario_Nombre);
-        etPwd = findViewById(R.id.etUsuario_Apellido_Pat);
+        etUsuario = findViewById(R.id.etMatricula);
+        etPwd = findViewById(R.id.etUsuario_Apellidos);
         pbar = findViewById(R.id.PBar);
 
         //Se crea el servicio para poder hacer las request
@@ -58,8 +58,8 @@ public class Login extends AppCompatActivity {
         btnLogin.setOnClickListener(v -> {
             if (validateDataFields()) {
                 pbar.smoothToShow();
-                String usuario = Objects.requireNonNull(etUsuario.getText()).toString();
-                String pwd = Objects.requireNonNull(etPwd.getText()).toString();
+                String usuario = Objects.requireNonNull(etUsuario.getText()).toString().trim();
+                String pwd = Objects.requireNonNull(etPwd.getText()).toString().trim();
 
                 JsonObject credenciales = new JsonObject();
 
@@ -77,7 +77,10 @@ public class Login extends AppCompatActivity {
 
                             DBHelper dbHelper = new DBHelper(Login.this);
 
-                            if (dbHelper.addCredentials(response.body().get("id").toString(), response.body().get("token").toString())) {
+                            String token = response.body().get("token").toString().replaceAll("\"", "");
+                            String id_usuario = response.body().get("id").toString().replaceAll("\"", "");
+
+                            if (dbHelper.addCredentials(id_usuario, token)) {
                                 startActivity(new Intent(Login.this, Inicio.class));
                                 overridePendingTransition(0, 0);
                                 Login.this.finish();

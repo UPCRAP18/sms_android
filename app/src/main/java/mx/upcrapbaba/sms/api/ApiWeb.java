@@ -1,4 +1,4 @@
-package mx.upcrapbaba.sms.API;
+package mx.upcrapbaba.sms.api;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;

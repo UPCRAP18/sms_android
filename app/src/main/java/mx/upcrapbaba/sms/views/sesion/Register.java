@@ -13,16 +13,16 @@ import com.wang.avi.AVLoadingIndicatorView;
 import java.util.Objects;
 
 import es.dmoral.toasty.Toasty;
-import mx.upcrapbaba.sms.API.ApiWeb;
-import mx.upcrapbaba.sms.API.Service.SMSService;
 import mx.upcrapbaba.sms.R;
+import mx.upcrapbaba.sms.api.ApiWeb;
+import mx.upcrapbaba.sms.api.Service.SMSService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class Register extends AppCompatActivity {
 
-    private MaterialEditText etUsr_Nombre, etUsr_Ap_Pat, etUsr_Ap_Mat, etUsr_Matricula, etUsr_Email, etUsr_Pwd;
+    private MaterialEditText etUsr_Nombre, etUsr_Aps, etUsr_Matricula, etUsr_Email, etUsr_Pwd;
     private AVLoadingIndicatorView pbar;
     private SMSService sms_service;
 
@@ -34,9 +34,8 @@ public class Register extends AppCompatActivity {
 
         Button btnRegistrar = findViewById(R.id.btnRegistrar);
         Button btnRegresar = findViewById(R.id.btnBack);
-        etUsr_Nombre = findViewById(R.id.etUsuario_Nombre);
-        etUsr_Ap_Pat = findViewById(R.id.etUsuario_Apellido_Pat);
-        etUsr_Ap_Mat = findViewById(R.id.etUsuario_Apellido_Mat);
+        etUsr_Nombre = findViewById(R.id.etMatricula);
+        etUsr_Aps = findViewById(R.id.etUsuario_Apellidos);
         etUsr_Matricula = findViewById(R.id.etUsuario_Matricula);
         etUsr_Email = findViewById(R.id.etUsuario_Email);
         etUsr_Pwd = findViewById(R.id.etUsuario_Pwd);
@@ -55,7 +54,7 @@ public class Register extends AppCompatActivity {
             if (validateData()) {
                 pbar.smoothToShow();
                 String usr_nombre = Objects.requireNonNull(etUsr_Nombre.getText()).toString();
-                String usr_apellidos = Objects.requireNonNull(etUsr_Ap_Pat.getText()).toString() + " " + Objects.requireNonNull(etUsr_Ap_Mat.getText()).toString();
+                String usr_apellidos = Objects.requireNonNull(etUsr_Aps.getText()).toString();
                 String usr_correo = Objects.requireNonNull(etUsr_Email.getText()).toString();
                 String usr_matricula = Objects.requireNonNull(etUsr_Matricula.getText()).toString();
                 String usr_pwd = Objects.requireNonNull(etUsr_Pwd.getText()).toString();
@@ -100,8 +99,7 @@ public class Register extends AppCompatActivity {
 
     private boolean validateData() {
         return (!Objects.requireNonNull(etUsr_Nombre.getText()).toString().isEmpty() &&
-                !Objects.requireNonNull(etUsr_Ap_Pat.getText()).toString().isEmpty() &&
-                !Objects.requireNonNull(etUsr_Ap_Mat.getText()).toString().isEmpty() &&
+                !Objects.requireNonNull(etUsr_Aps.getText()).toString().isEmpty() &&
                 !Objects.requireNonNull(etUsr_Matricula.getText()).toString().isEmpty() &&
                 !Objects.requireNonNull(etUsr_Email.getText()).toString().isEmpty() &&
                 !Objects.requireNonNull(etUsr_Pwd.getText()).toString().isEmpty());
