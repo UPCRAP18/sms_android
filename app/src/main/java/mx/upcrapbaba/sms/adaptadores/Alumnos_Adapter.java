@@ -5,22 +5,21 @@ import android.database.DataSetObserver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 import mx.upcrapbaba.sms.R;
 import mx.upcrapbaba.sms.models.Alumno;
 
 public class Alumnos_Adapter implements ListAdapter {
-    private ArrayList<Alumno> dataSet;
+    private List<Alumno> dataSet;
     private Context mContext;
 
-    public Alumnos_Adapter(ArrayList<Alumno> dataSet, Context mContext) {
+    public Alumnos_Adapter(List<Alumno> dataSet, Context mContext) {
         this.dataSet = dataSet;
         this.mContext = mContext;
     }
@@ -81,16 +80,13 @@ public class Alumnos_Adapter implements ListAdapter {
             TextView txtMatricula = convertView.findViewById(R.id.txtMatricula_Alumno);
             TextView txtNombre = convertView.findViewById(R.id.txtNombre_Alumno);
             TextView txtApellidos = convertView.findViewById(R.id.txtApellidos_Alumno);
+            TextView txtNoLista = convertView.findViewById(R.id.txtNo_Lista);
             ImageView imgAlumno_Photo = convertView.findViewById(R.id.imgAlumno_Photo);
-            ImageButton imgbEdit = convertView.findViewById(R.id.imgbEdit_Alumno);
 
             txtMatricula.setText(alumno_actual.getMatricula_alumno());
             txtNombre.setText(alumno_actual.getNombre_alumno());
-            txtApellidos.setText(alumno_actual.getApellidos_alumno());
-
-            imgbEdit.setOnClickListener(v -> {
-                Toasty.success(mContext, "Se ha clickeado en el alumno " + alumno_actual.getNombre_alumno()).show();
-            });
+            txtApellidos.setText(alumno_actual.getApellidos());
+            txtNoLista.setText(String.valueOf(position + 1));
 
         }
         return convertView;

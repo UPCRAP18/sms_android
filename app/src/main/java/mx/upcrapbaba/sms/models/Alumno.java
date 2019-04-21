@@ -5,21 +5,21 @@ import com.google.gson.annotations.Expose;
 public class Alumno {
 
     @Expose
-    String matricula_alumno;
+    private String matricula_alumno;
     @Expose
-    String nombre_alumno;
+    private String nombre_alumno;
     @Expose
-    String apellidos_alumno;
+    private String apellidos;
     @Expose
-    String[] grupo;
+    private String imagen_alumno;
     @Expose
-    String[] calificaciones;
+    private String[] calificaciones;
 
-    public Alumno(String matricula_alumno, String nombre_alumno, String apellidos_alumno, String[] grupo, String[] calificaciones) {
+    public Alumno(String matricula_alumno, String nombre_alumno, String apellidos, String imagen_alumno, String[] calificaciones) {
         this.matricula_alumno = matricula_alumno;
         this.nombre_alumno = nombre_alumno;
-        this.apellidos_alumno = apellidos_alumno;
-        this.grupo = grupo;
+        this.apellidos = apellidos;
+        this.imagen_alumno = imagen_alumno;
         this.calificaciones = calificaciones;
     }
 
@@ -39,20 +39,20 @@ public class Alumno {
         this.nombre_alumno = nombre_alumno;
     }
 
-    public String getApellidos_alumno() {
-        return apellidos_alumno;
+    public String getApellidos() {
+        return apellidos;
     }
 
-    public void setApellidos_alumno(String apellidos_alumno) {
-        this.apellidos_alumno = apellidos_alumno;
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
     }
 
-    public String[] getGrupo() {
-        return grupo;
+    public String getImagen_alumno() {
+        return imagen_alumno;
     }
 
-    public void setGrupo(String[] grupo) {
-        this.grupo = grupo;
+    public void setImagen_alumno(String imagen_alumno) {
+        this.imagen_alumno = imagen_alumno;
     }
 
     public String[] getCalificaciones() {
