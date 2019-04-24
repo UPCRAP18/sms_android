@@ -2,9 +2,6 @@ package mx.upcrapbaba.sms.api.Service;
 
 import com.google.gson.JsonObject;
 
-import mx.upcrapbaba.sms.models.Alumno;
-import mx.upcrapbaba.sms.models.Asignatura;
-import mx.upcrapbaba.sms.models.Grupo;
 import mx.upcrapbaba.sms.models.User;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -26,27 +23,6 @@ public interface SMSService {
     @GET("/usuarios/{id}")
     Call<User> getUserInfo(@Header("Authorization") String token, @Path("id") String id_usuario);
 
-    @Headers({
-            "Content-Type: application/json",
-            "Accept: application/json "
-    })
-    @GET("/materias/{id_materia}")
-    Call<Asignatura> getAsignaturas(@Header("Authorization") String token, @Path("id_materia") String id_materia);
-
-    @Headers({
-            "Content-Type: application/json",
-            "Accept: application/json "
-    })
-    @GET("/grupos/{id_grupo}")
-    Call<Grupo> getInfoGrupo(@Header("Authorization") String token, @Path("id_grupo") String id_grupo);
-
-    @Headers({
-            "Content-Type: application/json",
-            "Accept: application/json "
-    })
-    @GET("/alumnos/{id_alumno}")
-    Call<Alumno> getAlumnoInfo(@Header("Authorization") String token, @Path("id_alumno") String id_alumno);
-
 
     /* Peticiones POST a sms-api-v1 */
 
@@ -64,6 +40,13 @@ public interface SMSService {
     @POST("/usuarios/signup")
     Call<JsonObject> register(@Body JsonObject user_info);
 
+
+    @Headers({
+            "Content-Type: application/json",
+            "Accept: x-www-form-urlencoded"
+    })
+    @POST("/asignaturas/")
+    Call<JsonObject> add_asignatura(@Body JsonObject data, @Header("Authorization") String token);
 
     /* Peticiones PATCH a sms-api-v1 */
 

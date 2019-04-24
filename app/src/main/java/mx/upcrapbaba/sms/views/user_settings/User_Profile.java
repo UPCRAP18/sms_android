@@ -13,6 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.JsonObject;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -37,6 +39,7 @@ public class User_Profile extends AppCompatActivity {
     private Button btnSave;
     private SMSService sms_service;
     private AVLoadingIndicatorView pbar;
+    private User usuario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +59,7 @@ public class User_Profile extends AppCompatActivity {
 
         setData_User();
 
-        btnSave = findViewById(R.id.btnSave);
+        btnSave = findViewById(R.id.btnGuardar);
 
         imgEdit = findViewById(R.id.imgEdit);
         imgEditPhoto = findViewById(R.id.imgPhoto);
@@ -96,14 +99,18 @@ public class User_Profile extends AppCompatActivity {
             public void onResponse(Call<User> call, Response<User> response) {
                 pbar.smoothToShow();
                 if (response.isSuccessful() && response.body() != null) {
-                    etNombre.setText(response.body().getNombre());
-                    etMatricula.setText(response.body().getMatricula_empleado());
-                    etApellidos.setText(response.body().getApellidos());
-                    etEmail.setText(response.body().getEmail());
+                    usuario = response.body();
+                    etNombre.setText(usuario.getNombre());
+                    etMatricula.setText(usuario.getMatricula_empleado());
+                    etApellidos.setText(usuario.getApellidos());
+                    etEmail.setText(usuario.getEmail());
+                    String url = new ApiWeb().getBASE_URL_GLITCH() + "/" + usuario.getImagen_perfil();
+                    Glide.with(User_Profile.this).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(url).into(imgEditPhoto);
                     pbar.smoothToHide();
+
                 } else {
                     //TODO HANDLE
-                    System.out.println("Ha ocurrido un error al obtener los datos \n" + response.errorBody().toString());
+                    System.out.println("Ha ocurrido un error al obtener los datos \n" + response.message());
                     pbar.smoothToHide();
                 }
             }

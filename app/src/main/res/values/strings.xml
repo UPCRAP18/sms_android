@@ -36,15 +36,15 @@
     <string name="err_asignatura">No se ha encontrado ninguna asignatura</string>
     <string name="err_grupo">No se ha encontrado ningun grupo</string>
     <string name="err_alumnos">No se ha encontrado ningun alumno</string>
+    <string name="add_Asignatura">Añadir/Editar Asignatura</string>
+    <string name="add_Grupo">Añadir/Editar Grupo</string>
+    <string name="add_Alumno">Añadir/Editar Alumno</string>
 
 
     <!-- Perfil de usuario -->
     <string name="tab_name_perfil">Perfil</string>
     <string name="holder_pwd">Una Simple Contraseña</string>
     <string name="change_pwd">Cambiar contraseña</string>
-    <string name="add_edit_materias">Añadir/Editar Asignaturas</string>
-    <string name="add_edit_grupos">Añadir/Editar Grupos</string>
-    <string name="add_edit_criterios">Añadir/Editar Criterios</string>
     <string name="save">Guardar Cambios</string>
 
 
@@ -53,11 +53,27 @@
     <string name="body_error">Ha ocurrido un error al cargar los datos</string>
     <string name="cancelar">Cancelar</string>
     <string name="logout">Cerrar sesion</string>
+    <string name="header_warning">¡Advertencia!</string>
+    <string name="warning_del_grupo">¿Esta seguro de querer eliminar al grupo %s de la materia %s? </string>
 
     <!-- Notificacion de Red -->
     <string name="use_data">Usted está utilizando red de datos</string>
     <string name="no_Net">Usted no está conectado a la red</string>
     <string name="reintentar">Reintentar</string>
     <string name="aceptar">Aceptar</string>
+
+
+    <!-- Añadir/Editar Asignaturas -->
+    <string name="barTitle">Añadir/Editar %s</string>
+    <string name="add_holder">Añadir %s</string>
+    <string name="edit_holder">Editar %s</string>
+    <string name="btnSeleccionar">Seleccionar</string>
+    <string name="ht_nombre_asig">Nombre de Asignatura</string>
+    <string name="ht_cod_asig">Codigo de Asignatura</string>
+    <string name="btnEliminar_Grupo">Eliminar</string>
+    <string name="btnSave">Guardar</string>
+    <string name="err_Add_Edit_Asignatura">Por favor ingrese la informacion solicitada</string>
+    <string name="warning_notSel_Asignatura">Debe seleccionar una asignatura para poder eliminar un grupo</string>
+    <string name="warning_notSel_Grupo">Por favor seleccione un grupo para eliminar</string>
 
 </resources>

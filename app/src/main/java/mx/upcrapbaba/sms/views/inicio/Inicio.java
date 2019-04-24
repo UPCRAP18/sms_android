@@ -13,12 +13,14 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -40,6 +42,7 @@ import mx.upcrapbaba.sms.models.Asignatura;
 import mx.upcrapbaba.sms.models.Grupo;
 import mx.upcrapbaba.sms.models.User;
 import mx.upcrapbaba.sms.sqlite.DBHelper;
+import mx.upcrapbaba.sms.views.personalizacion.Add_Edit_Asignaturas;
 import mx.upcrapbaba.sms.views.user_settings.User_Profile;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -59,9 +62,9 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
     private List<Asignatura> asignaturas = new LinkedList<>();
     private List<Grupo> grupos = new LinkedList<>();
     private List<Alumno> alumnos = new LinkedList<>();
-
     private List<String> nombre_grupos = new LinkedList<>();
-
+    private FloatingActionButton fab_Add_Asignatura, fab_Add_Alumno, fab_Add_Grupo;
+    private int RESULT_POPUP = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +88,28 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         lstAlumnos = findViewById(R.id.lstAlumnos);
 
         spAsignaturas = findViewById(R.id.spAsignaturas);
-        spGrupos = findViewById(R.id.spGrupos);
+        spGrupos = findViewById(R.id.spGrupos_Edit);
 
         anim_empty_list = findViewById(R.id.empty_list);
         txtError_Message = findViewById(R.id.txtError_Message);
         lblAlumnos = findViewById(R.id.lblAlumnos);
+
+        fab_Add_Alumno = findViewById(R.id.fabAddAlumno);
+        fab_Add_Asignatura = findViewById(R.id.fabAddAsignatura);
+        fab_Add_Grupo = findViewById(R.id.fabAddGrupo);
+
+
+        fab_Add_Asignatura.setOnClickListener(v -> {
+            startActivityForResult(new Intent(Inicio.this, Add_Edit_Asignaturas.class).putExtra("SELECCIONADO", "Asignaturas"), RESULT_POPUP);
+        });
+
+        fab_Add_Alumno.setOnClickListener(v -> {
+
+        });
+
+        fab_Add_Grupo.setOnClickListener(v -> {
+
+        });
 
         Toolbar toolbar = findViewById(R.id.ToolBar);
         toolbar.setTitleTextColor(Color.WHITE);
@@ -104,6 +124,12 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         }
 
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        this.recreate();
     }
 
     @Override

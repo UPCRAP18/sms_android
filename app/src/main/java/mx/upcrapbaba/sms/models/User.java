@@ -18,6 +18,9 @@ public class User {
     @SerializedName("materias")
     private JsonArray materias;
 
+    public User() {
+    }
+
     public User(String matricula_empleado, String nombre, String apellidos, String email, String imagen_perfil, JsonArray materias) {
         this.matricula_empleado = matricula_empleado;
         this.nombre = nombre;
@@ -74,4 +77,5 @@ public class User {
     public void setMaterias(JsonArray materias) {
         this.materias = materias;
     }
+
 }

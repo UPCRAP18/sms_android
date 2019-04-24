@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -15,6 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
+        <activity
+            android:name=".views.personalizacion.Add_Edit_Asignaturas"
+            android:parentActivityName=".views.inicio.Inicio" />
         <activity
             android:name=".views.user_settings.User_Profile"
             android:parentActivityName=".views.inicio.Inicio" />
@@ -28,7 +30,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".views.sesion.Register" />
+        <activity
+            android:name=".views.sesion.Register"
+            android:parentActivityName=".views.sesion.Login" />
         <activity android:name=".views.sesion.Login" />
     </application>
 

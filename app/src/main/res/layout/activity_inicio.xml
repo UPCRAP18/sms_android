@@ -57,7 +57,7 @@
                 android:text="@string/lblAsignaturas"
                 android:textAlignment="center"
                 android:textColor="@color/purple_material"
-                android:textSize="18sp" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/txtGrupos"
@@ -69,7 +69,7 @@
                 android:text="@string/lblGrupos"
                 android:textAlignment="center"
                 android:textColor="@color/purple_material"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:visibility="visible" />
 
         </LinearLayout>
@@ -95,7 +95,7 @@
                 android:spinnerMode="dropdown" />
 
             <Spinner
-                android:id="@+id/spGrupos"
+                android:id="@+id/spGrupos_Edit"
                 style="@style/SpinnerStyle"
                 android:layout_width="0dp"
                 android:layout_height="38dp"
@@ -126,9 +126,10 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
+        android:fontFamily="@font/andika"
         android:text="@string/lblAlumnos"
         android:textColor="@color/purple_material"
-        android:textSize="24sp"
+        android:textSize="20sp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -175,6 +176,52 @@
         app:layout_constraintTop_toBottomOf="@+id/lblAlumnos">
 
     </ListView>
+
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/fab_labels"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:fab_addButtonColorNormal="@color/white"
+        app:fab_addButtonColorPressed="@color/white_pressed"
+        app:fab_addButtonPlusIconColor="@color/half_black"
+        app:fab_addButtonSize="normal"
+        app:fab_labelStyle="@style/menu_labels_style"
+        app:fab_labelsPosition="left"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAddAlumno"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/white"
+            app:fab_colorPressed="@color/white_pressed"
+            app:fab_icon="@drawable/student_nav"
+            app:fab_title="@string/add_Alumno" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAddGrupo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/white"
+            app:fab_colorPressed="@color/white_pressed"
+            app:fab_icon="@drawable/grupo"
+            app:fab_title="@string/add_Grupo" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAddAsignatura"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/white"
+            app:fab_colorPressed="@color/white_pressed"
+            app:fab_icon="@drawable/materia"
+            app:fab_title="@string/add_Asignatura" />
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
 
     <it.sephiroth.android.library.bottomnavigation.BottomNavigation
         android:id="@+id/bottom_nav_bar"

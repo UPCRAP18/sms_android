@@ -9,10 +9,14 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 import mx.upcrapbaba.sms.R;
+import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.models.Alumno;
 
 public class Alumnos_Adapter implements ListAdapter {
@@ -82,6 +86,9 @@ public class Alumnos_Adapter implements ListAdapter {
             TextView txtApellidos = convertView.findViewById(R.id.txtApellidos_Alumno);
             TextView txtNoLista = convertView.findViewById(R.id.txtNo_Lista);
             ImageView imgAlumno_Photo = convertView.findViewById(R.id.imgAlumno_Photo);
+
+            String url = new ApiWeb().getBASE_URL_GLITCH() + "/" + alumno_actual.getImagen_alumno();
+            Glide.with(mContext).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(url).into(imgAlumno_Photo);
 
             txtMatricula.setText(alumno_actual.getMatricula_alumno());
             txtNombre.setText(alumno_actual.getNombre_alumno());

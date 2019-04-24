@@ -67,7 +67,7 @@
                 android:id="@+id/imgEdit"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginEnd="24dp"
+                android:layout_marginEnd="16dp"
                 app:layout_constraintBottom_toBottomOf="@+id/imgPhoto"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:srcCompat="@drawable/edit" />
@@ -76,11 +76,11 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -97,28 +97,28 @@
                 <TextView
                     android:id="@+id/txtMatricula"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_margin="3dp"
-                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:fontFamily="sans-serif"
                     android:text="@string/ht_matricula"
                     android:textAlignment="center"
                     android:textColor="@color/colorAccent"
-                    android:textSize="20sp" />
+                    android:textSize="18sp" />
 
                 <EditText
                     android:id="@+id/etMatricula"
                     style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_margin="3dp"
-                    android:layout_weight="2"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
                     android:ems="10"
                     android:enabled="false"
+                    android:fontFamily="sans-serif"
                     android:hint="@string/ht_matricula"
                     android:inputType="textPersonName"
                     android:textAlignment="center"
                     android:textColor="@color/colorPrimaryDark"
-                    android:textSize="16sp" />
+                    android:textSize="18sp" />
 
             </LinearLayout>
 
@@ -131,64 +131,66 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/txtNombre"
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_margin="3dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
                         android:layout_weight="1"
                         android:text="@string/ht_nombre"
                         android:textAlignment="center"
                         android:textColor="@color/colorAccent"
-                        android:textSize="20sp" />
+                        android:textSize="18sp" />
 
                     <TextView
                         android:id="@+id/txtApellidos"
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_margin="3dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
                         android:layout_weight="1"
                         android:text="@string/ht_apellidos"
                         android:textAlignment="center"
                         android:textColor="@color/colorAccent"
-                        android:textSize="20sp" />
+                        android:textSize="18sp" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:orientation="horizontal">
 
                     <EditText
                         android:id="@+id/etNombre"
                         style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_margin="3dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
                         android:layout_weight="1"
                         android:ems="10"
                         android:hint="@string/ht_nombre"
                         android:inputType="textPersonName"
                         android:textAlignment="center"
                         android:textColor="@color/colorPrimaryDark"
-                        android:textSize="16sp" />
+                        android:textSize="18sp" />
 
                     <EditText
                         android:id="@+id/etApellidos"
                         style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_margin="3dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
                         android:layout_weight="1"
                         android:ems="10"
                         android:hint="@string/ht_apellidos"
                         android:inputType="textPersonName"
                         android:textAlignment="center"
                         android:textColor="@color/colorPrimaryDark"
-                        android:textSize="16sp" />
+                        android:textSize="18sp" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -209,24 +211,24 @@
                     <TextView
                         android:id="@+id/txtEmail"
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_margin="3dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
                         android:layout_weight="1"
                         android:text="@string/ht_email"
                         android:textAlignment="center"
                         android:textColor="@color/colorAccent"
-                        android:textSize="20sp" />
+                        android:textSize="18sp" />
 
                     <TextView
                         android:id="@+id/txtPwd"
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_margin="3dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
                         android:layout_weight="1"
                         android:text="@string/ht_pwd"
                         android:textAlignment="center"
                         android:textColor="@color/colorAccent"
-                        android:textSize="20sp" />
+                        android:textSize="18sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -239,22 +241,22 @@
                         android:id="@+id/etEmail"
                         style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_margin="3dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
                         android:layout_weight="1"
                         android:ems="10"
                         android:hint="@string/ht_email"
                         android:inputType="textEmailAddress"
                         android:textAlignment="center"
                         android:textColor="@color/colorPrimaryDark"
-                        android:textSize="16sp" />
+                        android:textSize="18sp" />
 
                     <EditText
                         android:id="@+id/etPwd"
                         style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_margin="3dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
                         android:layout_weight="1"
                         android:ems="10"
                         android:enabled="false"
@@ -263,89 +265,37 @@
                         android:text="@string/holder_pwd"
                         android:textAlignment="center"
                         android:textColor="@color/colorPrimaryDark"
-                        android:textSize="16sp" />
+                        android:textSize="18sp" />
                 </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnChangePwd"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@color/transparent"
-                    android:drawableStart="@drawable/edit"
-                    android:drawablePadding="12dp"
-                    android:padding="8dp"
-                    android:text="@string/change_pwd"
-                    android:textAlignment="viewStart"
-                    android:textColor="@color/indigo_material" />
-
-                <Button
-                    android:id="@+id/btnAdd_Edit_Materias"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@color/transparent"
-                    android:drawableStart="@drawable/edit"
-                    android:drawablePadding="12dp"
-                    android:padding="8dp"
-                    android:text="@string/add_edit_materias"
-                    android:textAlignment="viewStart"
-                    android:textColor="@color/indigo_material" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnAdd_Edit_Grupos"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@color/transparent"
-                    android:drawableStart="@drawable/edit"
-                    android:drawablePadding="12dp"
-                    android:padding="8dp"
-                    android:text="@string/add_edit_grupos"
-                    android:textAlignment="viewStart"
-                    android:textColor="@color/indigo_material" />
-
-                <Button
-                    android:id="@+id/btnAdd_Edit_Criterios"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@color/transparent"
-                    android:drawableStart="@drawable/edit"
-                    android:drawablePadding="12dp"
-                    android:padding="8dp"
-                    android:text="@string/add_edit_criterios"
-                    android:textAlignment="viewStart"
-                    android:textColor="@color/indigo_material" />
-
-            </LinearLayout>
-
             <Button
-                android:id="@+id/btnSave"
+                android:id="@+id/btnChangePwd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="12dp"
+                android:background="@color/transparent"
+                android:drawableStart="@drawable/edit"
+                android:drawablePadding="12dp"
+                android:padding="8dp"
+                android:text="@string/change_pwd"
+                android:textAlignment="textStart"
+                android:textColor="@color/indigo_material"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btnGuardar"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:layout_margin="12dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginEnd="12dp"
                 android:background="@color/transparent"
                 android:text="@string/save"
                 android:textColor="@color/colorAccent"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
         </LinearLayout>
 
