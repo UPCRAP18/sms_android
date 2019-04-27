@@ -53,12 +53,12 @@ public class Spinner_Adapter extends ArrayAdapter {
 
 
         mViewHolder.txtNombre_Materia.setText(asignatura_actual.getNombre_materia());
-        if (asignatura_actual.getImagen_materia() == null) {
+        if (asignatura_actual.getImagen_materia().isEmpty() || asignatura_actual.getImagen_materia() == null) {
             Glide.with(mContext).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(mContext.getDrawable(R.drawable.materia_holder)).into(mViewHolder.imgImagen_Materia);
         } else {
             String url = new ApiWeb().getBASE_URL_GLITCH() + "/" + asignatura_actual.getImagen_materia();
-
             Glide.with(mContext).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(url).into(mViewHolder.imgImagen_Materia);
+
         }
         return convertView;
     }

@@ -63,7 +63,6 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
     private List<Grupo> grupos = new LinkedList<>();
     private List<Alumno> alumnos = new LinkedList<>();
     private List<String> nombre_grupos = new LinkedList<>();
-    private FloatingActionButton fab_Add_Asignatura, fab_Add_Alumno, fab_Add_Grupo;
     private int RESULT_POPUP = 0;
 
     @Override
@@ -94,9 +93,9 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         txtError_Message = findViewById(R.id.txtError_Message);
         lblAlumnos = findViewById(R.id.lblAlumnos);
 
-        fab_Add_Alumno = findViewById(R.id.fabAddAlumno);
-        fab_Add_Asignatura = findViewById(R.id.fabAddAsignatura);
-        fab_Add_Grupo = findViewById(R.id.fabAddGrupo);
+        FloatingActionButton fab_Add_Alumno = findViewById(R.id.fabAddAlumno);
+        FloatingActionButton fab_Add_Asignatura = findViewById(R.id.fabAddAsignatura);
+        FloatingActionButton fab_Add_Grupo = findViewById(R.id.fabAddGrupo);
 
 
         fab_Add_Asignatura.setOnClickListener(v -> {
@@ -169,7 +168,6 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
                         spAsignaturas.setEnabled(false);
                         pbar.smoothToHide();
                     } else {
-                        pbar.smoothToHide();
                         spAsignaturas.setAdapter(new Spinner_Adapter(Inicio.this, R.layout.asignatura_item, asignaturas));
                         setOnSelectedListener();
                     }
@@ -210,6 +208,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
                     anim_empty_list.setVisibility(View.VISIBLE);
                     txtError_Message.setText(R.string.err_grupo);
                     txtError_Message.setVisibility(View.VISIBLE);
+                    pbar.smoothToHide();
                 } else {
                     spGrupos.setEnabled(true);
                     anim_empty_list.setVisibility(View.GONE);
@@ -243,11 +242,13 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
                     txtError_Message.setVisibility(View.VISIBLE);
                     lblAlumnos.setVisibility(View.GONE);
                     lstAlumnos.setAdapter(new ArrayAdapter<>(Inicio.this, android.R.layout.simple_list_item_1));
+                    pbar.smoothToHide();
                 } else {
                     anim_empty_list.setVisibility(View.GONE);
                     txtError_Message.setVisibility(View.GONE);
                     lblAlumnos.setVisibility(View.VISIBLE);
                     lstAlumnos.setAdapter(new Alumnos_Adapter(alumnos, Inicio.this));
+                    pbar.smoothToHide();
                 }
 
             }

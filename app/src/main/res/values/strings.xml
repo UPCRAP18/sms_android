@@ -54,7 +54,8 @@
     <string name="cancelar">Cancelar</string>
     <string name="logout">Cerrar sesion</string>
     <string name="header_warning">¡Advertencia!</string>
-    <string name="warning_del_grupo">¿Esta seguro de querer eliminar al grupo %s de la materia %s? </string>
+    <string name="warning_del_grupo">¿Esta seguro de querer eliminar al grupo %s de la asignatura %s?</string>
+    <string name="warning_del_asignatura">¿Esta seguro de querer eliminar la asignatura %s?</string>
 
     <!-- Notificacion de Red -->
     <string name="use_data">Usted está utilizando red de datos</string>
@@ -70,10 +71,14 @@
     <string name="btnSeleccionar">Seleccionar</string>
     <string name="ht_nombre_asig">Nombre de Asignatura</string>
     <string name="ht_cod_asig">Codigo de Asignatura</string>
-    <string name="btnEliminar_Grupo">Eliminar</string>
+    <string name="btnEliminar_Grupo">Eliminar Grupo/s</string>
+    <string name="btnEliminar_Asignatura">Eliminar Asignatura</string>
     <string name="btnSave">Guardar</string>
     <string name="err_Add_Edit_Asignatura">Por favor ingrese la informacion solicitada</string>
     <string name="warning_notSel_Asignatura">Debe seleccionar una asignatura para poder eliminar un grupo</string>
     <string name="warning_notSel_Grupo">Por favor seleccione un grupo para eliminar</string>
+    <string name="warning_notSel_Asignatura_Del">Por favor seleccione una asignatura para eliminar</string>
+    <string name="lblGrupos_Asignatura">Grupos de la asignatura</string>
+    <string name="lblGrupos_General">Añadir grupo/s</string>
 
 </resources>

@@ -45,7 +45,7 @@ public interface SMSService {
             "Content-Type: application/json",
             "Accept: x-www-form-urlencoded"
     })
-    @POST("/asignaturas/")
+    @POST("/materias/")
     Call<JsonObject> add_asignatura(@Body JsonObject data, @Header("Authorization") String token);
 
     /* Peticiones PATCH a sms-api-v1 */
@@ -56,5 +56,6 @@ public interface SMSService {
     })
     @PATCH("/usuarios/{id_user}")
     Call<JsonObject> update_data(@Body JsonObject user_data, @Header("Authorization") String token, @Path("id_user") String id_user);
+
 
 }
