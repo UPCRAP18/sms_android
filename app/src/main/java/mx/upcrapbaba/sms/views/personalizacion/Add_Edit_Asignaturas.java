@@ -104,9 +104,11 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
 
         btnEliminar_Grupo.setOnClickListener(v -> {
             if (asignatura_seleccionada != null) {
-                if (grupo_seleccionado != null) {
+                if (!grupos_to_add.isEmpty()) {
                     DeleteGroup(grupos_to_add);
+                    grupos_to_add.clear();
                 } else {
+                    grupos_to_add.clear();
                     Toasty.warning(Add_Edit_Asignaturas.this, getResources().getString(R.string.warning_notSel_Grupo)).show();
                 }
             } else {
@@ -185,10 +187,6 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
                     Asignatura asignatura_seleccionada = asignaturas.get(spAsignaturas.getSelectedItemPosition());
                     //Toasty.info(Add_Edit_Asignaturas.this,
                     //"Esta por actualizar la materia " + .getNombre_materia()).show();
-
-                    asignaturas_original.remove(asignatura_seleccionada);
-
-
 
                 } else {
 
@@ -331,11 +329,11 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
     private void loadDataAsignatura(Asignatura asignatura) {
         txtTipo_Grupo.setText(getResources().getString(R.string.lblGrupos_Asignatura));
         asignatura_seleccionada = asignatura;
-        etCod_Asig.setText(asignatura.getCodigo_materia());
-        etNombre_Asig.setText(asignatura.getNombre_materia());
+        etCod_Asig.setText(asignatura_seleccionada.getCodigo_materia());
+        etNombre_Asig.setText(asignatura_seleccionada.getNombre_materia());
         nombre_asignatura_grupo.clear();
-        if (asignatura.getImagen_materia() != null) {
-            String url = new ApiWeb().getBASE_URL_GLITCH() + "/" + asignatura.getImagen_materia();
+        if (asignatura_seleccionada.getImagen_materia() != null) {
+            String url = new ApiWeb().getBASE_URL_GLITCH() + "/" + asignatura_seleccionada.getImagen_materia();
             Glide.with(Add_Edit_Asignaturas.this).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(url).into(imgAsignatura);
         } else {
             Glide.with(Add_Edit_Asignaturas.this).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(Add_Edit_Asignaturas.this.getDrawable(R.drawable.materia_holder)).into(imgAsignatura);
@@ -343,14 +341,14 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
 
         grupos.clear();
 
-        grupos = new Gson().fromJson(asignatura.getGrupos(), new TypeToken<List<Grupo>>() {
+        grupos = new Gson().fromJson(asignatura_seleccionada.getGrupos(), new TypeToken<List<Grupo>>() {
         }.getType());
 
         for (int i = 0; i < grupos.size(); i++) {
             nombre_asignatura_grupo.add(asignatura_seleccionada.getNombre_materia());
         }
 
-        if (asignatura.getNombre_materia() != null && !grupos.isEmpty()) {
+        if (asignatura_seleccionada.getNombre_materia() != null && !grupos.isEmpty()) {
             lstGrupos.setAdapter(new Grupos_Adapter(Add_Edit_Asignaturas.this, grupos, nombre_asignatura_grupo, Add_Edit_Asignaturas.this));
         } else {
             getGrupos_General();
@@ -365,14 +363,14 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
 
     @Override
     public void OnItemGroupSelected(Grupo grupo_seleccionado, String asignatura_grupo) {
-        this.grupo_seleccionado = grupo_seleccionado;
-        Toasty.success(Add_Edit_Asignaturas.this, "Se ha seleccionado el grupo " + grupo_seleccionado.getNombre_grupo()).show();
+        //this.grupo_seleccionado = grupo_seleccionado;
+        //Toasty.success(Add_Edit_Asignaturas.this, "Se ha seleccionado el grupo " + grupo_seleccionado.getNombre_grupo()).show();
         grupos_to_add.add(grupo_seleccionado);
     }
 
     @Override
     public void OnItemGroupDeselected(Grupo grupo_seleccionado, String grupo_asignatura) {
-        Toasty.success(Add_Edit_Asignaturas.this, "Se ha deseleccionado el grupo " + grupo_seleccionado.getNombre_grupo()).show();
+        //Toasty.success(Add_Edit_Asignaturas.this, "Se ha deseleccionado el grupo " + grupo_seleccionado.getNombre_grupo()).show();
         grupos_to_add.remove(grupo_seleccionado);
     }
 
@@ -390,6 +388,27 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
                 .setPositiveButton(getResources().getString(R.string.btnEliminar_Grupo), (dialog, which) -> {
                     //Toasty.info(Add_Edit_Asignaturas.this, "Se ha eliminado").show();
 
+                    List<Grupo> grupos = new Gson().fromJson(asignatura_seleccionada.getGrupos(), new TypeToken<List<Grupo>>() {
+                    }.getType());
+
+                    for (Grupo grupo_eliminar : grupos_seleccionados) {
+                        grupos.remove(grupo_eliminar);
+                    }
+
+                    JsonArray grupos_list = (JsonArray) new Gson().toJsonTree(grupos, new TypeToken<List<Grupo>>() {
+                    }.getType());
+
+                    asignatura_seleccionada.setGrupos(grupos_list);
+
+                    List<Grupo> grupos_temp = new Gson().fromJson(asignatura_seleccionada.getGrupos(), new TypeToken<List<Grupo>>() {
+                    }.getType());
+
+                    for (Grupo grupo_temp : grupos_temp) {
+                        System.out.println(grupo_temp.getNombre_grupo());
+                    }
+
+                    //loadDataAsignatura(asignatura_seleccionada);
+
 
                 }).create().show();
     }
@@ -401,7 +420,13 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
                 .setNegativeButton(getResources().getString(R.string.cancelar), (dialog, which) -> dialog.dismiss())
                 .setPositiveButton(getResources().getString(R.string.btnEliminar_Asignatura), (dialog, which) -> {
                     Toasty.info(Add_Edit_Asignaturas.this, "Se ha eliminado").show();
+                    asignaturas_original.remove(asignatura_seleccionada);
+                    asignaturas.remove(asignatura_seleccionada);
+                    spAsignaturas.setAdapter(new Spinner_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
+                    getGrupos_General();
+
                 }).create().show();
     }
+
 
 }

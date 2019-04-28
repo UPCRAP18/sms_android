@@ -7,6 +7,6 @@
     android:text="Simple"
     android:textAlignment="center"
     android:textColor="@color/purple_material"
-    android:textSize="18sp">
+    android:textSize="16sp">
 
 </TextView>
