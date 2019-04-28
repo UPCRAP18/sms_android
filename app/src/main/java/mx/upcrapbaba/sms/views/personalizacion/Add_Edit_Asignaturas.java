@@ -390,7 +390,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
                 .setPositiveButton(getResources().getString(R.string.btnEliminar_Grupo), (dialog, which) -> {
                     //Toasty.info(Add_Edit_Asignaturas.this, "Se ha eliminado").show();
 
-                    
+
                 }).create().show();
     }
 
