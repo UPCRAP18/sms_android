@@ -1,11 +1,7 @@
 package mx.upcrapbaba.sms.views.personalizacion;
 
-import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -13,7 +9,6 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -25,12 +20,16 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.File;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
+import kotlin.Unit;
 import mx.upcrapbaba.sms.R;
+import mx.upcrapbaba.sms.adaptadores.Asignaturas_Adapter;
 import mx.upcrapbaba.sms.adaptadores.Grupos_Adapter;
 import mx.upcrapbaba.sms.adaptadores.Spinner_Adapter;
 import mx.upcrapbaba.sms.api.ApiWeb;
@@ -43,11 +42,10 @@ import mx.upcrapbaba.sms.sqlite.DBHelper;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import timber.log.Timber;
 
-public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Adapter.GroupListener {
+public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Adapter.GroupListener, Asignaturas_Adapter.AsignaturaListener {
 
-    private String SELECCIONADO = "";
+    private String SELECCIONADO = "", token = "";
     private User user_data;
     private List<Asignatura> asignaturas_original = new LinkedList<>(), asignaturas = new LinkedList<>();
     private List<Grupo> grupos = new LinkedList<>(), grupos_to_add = new LinkedList<>();
@@ -57,25 +55,27 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
     private ImageView imgAsignatura;
     private Button btnSeleccionar_Asignatura;
     private int REQUEST_GET_SINGLE_FILE = 1;
-    private boolean isForUpdate = false;
-    private ListView lstGrupos;
+    private boolean isForUpdate = false, isDeletedAsign = false;
+    private ListView lstGrupos, lstAsignaturas;
     private Asignatura asignatura_seleccionada;
-    private Grupo grupo_seleccionado = new Grupo();
     private TextView txtTipo_Grupo;
+    private SMSService sms_service;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_add_edit_asignaturas);
 
-        SMSService sms_service = ApiWeb.getApi(new ApiWeb().getBASE_URL_GLITCH()).create(SMSService.class);
-        String token = "Bearer " + new DBHelper(this).getData_Usuario().get(1);
+        sms_service = ApiWeb.getApi(new ApiWeb().getBASE_URL_GLITCH()).create(SMSService.class);
+        token = "Bearer " + new DBHelper(this).getData_Usuario().get(1);
         String id_usuario = new DBHelper(this).getData_Usuario().get(0);
 
         if (getIntent().getExtras() != null) {
             SELECCIONADO = getIntent().getStringExtra("SELECCIONADO");
         } else {
             //TODO Regresar al inicio
+
         }
 
         Toolbar toolbar = findViewById(R.id.ToolBar);
@@ -97,6 +97,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
         spAsignaturas = findViewById(R.id.spAsignaturas_Edit);
         lstGrupos = findViewById(R.id.lstGrupos);
         txtTipo_Grupo = findViewById(R.id.txtTipo_Grupos);
+        lstAsignaturas = findViewById(R.id.lstAsignaturas_Online);
 
         Button btnSave = findViewById(R.id.btnGuardar);
         Button btnEliminar_Grupo = findViewById(R.id.btnEliminar_Grupo);
@@ -108,10 +109,10 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
                     DeleteGroup(grupos_to_add);
                     grupos_to_add.clear();
                 } else {
-                    grupos_to_add.clear();
                     Toasty.warning(Add_Edit_Asignaturas.this, getResources().getString(R.string.warning_notSel_Grupo)).show();
                 }
             } else {
+                grupos_to_add.clear();
                 Toasty.warning(Add_Edit_Asignaturas.this, getResources().getString(R.string.warning_notSel_Asignatura)).show();
             }
         });
@@ -119,17 +120,34 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
         btnEliminar_Asignatura.setOnClickListener(v -> {
             if (asignatura_seleccionada != null) {
                 DeleteAsignatura(asignatura_seleccionada);
+                grupos_to_add.clear();
             } else {
+                grupos_to_add.clear();
                 Toasty.warning(Add_Edit_Asignaturas.this, getResources().getString(R.string.warning_notSel_Asignatura_Del)).show();
             }
         });
 
         btnSeleccionar_Asignatura = findViewById(R.id.btnSelect_Edit);
 
+        sms_service.getAllAsignaturas(token).enqueue(new Callback<List<Asignatura>>() {
+            @Override
+            public void onResponse(@NotNull Call<List<Asignatura>> call, @NotNull Response<List<Asignatura>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    lstAsignaturas.setAdapter(new Asignaturas_Adapter(Add_Edit_Asignaturas.this, response.body(), Add_Edit_Asignaturas.this));
+                } else {
+                    //TODO HANDLE
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<List<Asignatura>> call, @NotNull Throwable t) {
+                //TODO HANDLE
+            }
+        });
 
         sms_service.getUserInfo(token, id_usuario).enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(@NotNull Call<User> call, @NotNull Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     user_data = response.body();
 
@@ -141,17 +159,17 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
 
                     getGrupos_General();
 
-                    asignaturas.add(new Asignatura("", "", "", new JsonArray()));
+                    asignaturas.add(new Asignatura("", "Agregar nueva asignatura", "", new JsonArray()));
 
                     spAsignaturas.setAdapter(new Spinner_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
 
                     btnSeleccionar_Asignatura.setOnClickListener(v -> {
                         if (spAsignaturas.getSelectedItemPosition() != (asignaturas.size() - 1)) {
+                            System.out.println("Indice de la asignatura seleccionada: " + spAsignaturas.getSelectedItemPosition());
                             isForUpdate = true;
                             loadDataAsignatura(asignaturas.get(spAsignaturas.getSelectedItemPosition()));
                         } else {
                             asignatura_seleccionada = null;
-                            grupo_seleccionado = null;
                             isForUpdate = false;
                             etCod_Asig.getText().clear();
                             etNombre_Asig.getText().clear();
@@ -169,27 +187,70 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
                     });
 
                 } else {
+                    //TODO HANDLE
                     System.out.println(response.errorBody());
                     Toasty.warning(Add_Edit_Asignaturas.this, "Ha ocurrido un error").show();
                 }
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(@NotNull Call<User> call, @NotNull Throwable t) {
+                //TODO HANDLE
                 System.out.println(t.toString());
             }
         });
 
-
         btnSave.setOnClickListener(v -> {
-            if (validateFiedlsAsignaturas()) {
-                if (isForUpdate) {
-                    Asignatura asignatura_seleccionada = asignaturas.get(spAsignaturas.getSelectedItemPosition());
-                    //Toasty.info(Add_Edit_Asignaturas.this,
-                    //"Esta por actualizar la materia " + .getNombre_materia()).show();
+            if (isForUpdate) {
+                if (validateFiedlsAsignaturas()) {
+                    String codigo_mat = etCod_Asig.getText().toString();
+                    String nombre_mat = etNombre_Asig.getText().toString();
+
+                    if (asignatura_seleccionada.getNombre_materia().equals("Agregar nueva asignatura")) {
+                        System.out.println("No hay ninguna asignatura que actualizar, actaulizando los valores en el arreglo");
+                    } else {
+                        //Actualizo los valores del seleccionado, elimino el original y subo el nuevo, respetando los indices
+                        int index = asignaturas_original.indexOf(asignatura_seleccionada);
+                        asignaturas_original.remove(asignatura_seleccionada);
+                        asignatura_seleccionada.setCodigo_materia(codigo_mat);
+                        asignatura_seleccionada.setNombre_materia(nombre_mat);
+                        asignaturas_original.add(index, asignatura_seleccionada);
+                    }
+
+                    new AlertDialog.Builder(Add_Edit_Asignaturas.this)
+                            .setTitle(getResources().getString(R.string.header_warning))
+                            .setMessage(getResources().getString(R.string.warn_update_asign))
+                            .setNegativeButton(getResources().getString(R.string.cancelar), (dialog, which) -> dialog.dismiss())
+                            .setPositiveButton(getResources().getString(R.string.btnSave), (dialog, which) -> {
+
+                                JsonObject data_Usuario = new JsonObject();
+
+                                JsonArray asignaturas_array = (JsonArray) new Gson().toJsonTree(asignaturas_original,
+                                        new TypeToken<List<Asignatura>>() {
+                                        }.getType());
+
+                                data_Usuario.add("materias", asignaturas_array);
+
+                                sms_service.update_data(data_Usuario, token, id_usuario).enqueue(new Callback<JsonObject>() {
+                                    @Override
+                                    public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                                        //TODO HANDLE
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<JsonObject> call, Throwable t) {
+                                        //TODO HANDLE
+                                    }
+                                });
+
+                            }).create().show();
 
                 } else {
-
+                    //Quiere guardar el codigo o nombre vacio
+                    Toasty.warning(Add_Edit_Asignaturas.this, getResources().getString(R.string.err_Add_Edit_Asignatura)).show();
+                }
+            } else {
+                if (validateFiedlsAsignaturas()) {
                     JsonArray grupos_selected = (JsonArray) new Gson().toJsonTree(grupos_to_add, new TypeToken<List<Grupo>>() {
                     }.getType());
 
@@ -231,19 +292,22 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
                                         if (response.isSuccessful()) {
                                             Add_Edit_Asignaturas.this.recreate();
                                         } else {
-                                            System.out.println(response.body().toString());
+                                            //TODO HANDLE
+                                            System.out.println(response.errorBody());
                                             Toasty.warning(Add_Edit_Asignaturas.this, "Ha ocurrido un error").show();
                                         }
                                     }
 
                                     @Override
                                     public void onFailure(Call<JsonObject> call, Throwable t) {
+                                        //TODO HANDLE
                                         System.out.println(t.toString());
                                         Toasty.warning(Add_Edit_Asignaturas.this, "Ha ocurrido un error en la request").show();
                                     }
                                 });
 
                             } else {
+                                //TODO HANDLE
                                 System.out.println(response.body().get("message"));
                                 Toasty.warning(Add_Edit_Asignaturas.this, "Ha ocurrido un error").show();
                             }
@@ -256,15 +320,232 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
                         }
                     });
 
+                } else {
+                    Toasty.warning(Add_Edit_Asignaturas.this, getResources().getString(R.string.err_Add_Edit_Asignatura)).show();
                 }
-            } else {
-                Toasty.warning(Add_Edit_Asignaturas.this, getResources().getString(R.string.err_Add_Edit_Asignatura)).show();
             }
         });
 
     }
 
-    //TODO FIX THISSSSS
+    /**
+     * Obtiene los grupos de manera general, tanto los que estan en las asignaturas del usuario
+     * como los que estan almacenados en la nube (plantillas)
+     */
+    private void getGrupos_General() {
+        sms_service.getAllGroups(token).enqueue(new Callback<List<Grupo>>() {
+            @Override
+            public void onResponse(Call<List<Grupo>> call, Response<List<Grupo>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Grupo> grupos_general = new LinkedList<>();
+                    List<List<Grupo>> grupos_List = new LinkedList<>();
+                    nombre_asignatura_grupo.clear();
+                    txtTipo_Grupo.setText(getResources().getString(R.string.lblGrupos_General));
+
+                    for (int i = 0; i < asignaturas.size(); i++) {
+                        grupos_List.add(new Gson().fromJson(asignaturas.get(i).getGrupos(), new TypeToken<List<Grupo>>() {
+                        }.getType()));
+                        for (int j = 0; j < grupos_List.get(i).size(); j++) {
+                            nombre_asignatura_grupo.add(asignaturas.get(i).getNombre_materia());
+                        }
+                    }
+
+                    for (int i = 0; i < grupos_List.size(); i++) {
+                        grupos_general.addAll(grupos_List.get(i));
+                    }
+
+                    for (Grupo grupo_online : response.body()) {
+                        grupos_general.add(grupo_online);
+                        nombre_asignatura_grupo.add("Servidor");
+                    }
+
+                    lstGrupos.setAdapter(new Grupos_Adapter(Add_Edit_Asignaturas.this, grupos_general, nombre_asignatura_grupo, Add_Edit_Asignaturas.this));
+                } else {
+                    Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
+                            .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                Add_Edit_Asignaturas.this.recreate();
+                                return Unit.INSTANCE;
+                            }).show();
+                    System.out.println(response.errorBody());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Grupo>> call, Throwable t) {
+                Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
+                        .positiveButton(R.string.aceptar, null, materialDialog -> {
+                            Add_Edit_Asignaturas.this.recreate();
+                            return Unit.INSTANCE;
+                        }).show();
+                System.out.println(t.toString());
+            }
+        });
+
+    }
+
+    /**
+     * Carga los datos de la asignatura seleccionada
+     *
+     * @param asignatura --> Asignatura seleccionada
+     */
+    private void loadDataAsignatura(Asignatura asignatura) {
+        txtTipo_Grupo.setText(getResources().getString(R.string.lblGrupos_Asignatura));
+        asignatura_seleccionada = asignatura;
+        etCod_Asig.setText(asignatura_seleccionada.getCodigo_materia());
+        etNombre_Asig.setText(asignatura_seleccionada.getNombre_materia());
+        nombre_asignatura_grupo.clear();
+        if (asignatura_seleccionada.getImagen_materia() != null) {
+            String url = new ApiWeb().getBASE_URL_GLITCH() + "/" + asignatura_seleccionada.getImagen_materia();
+            Glide.with(Add_Edit_Asignaturas.this).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(url).into(imgAsignatura);
+        } else {
+            Glide.with(Add_Edit_Asignaturas.this).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(Add_Edit_Asignaturas.this.getDrawable(R.drawable.materia_holder)).into(imgAsignatura);
+        }
+
+        grupos.clear();
+
+        grupos = new Gson().fromJson(asignatura_seleccionada.getGrupos(), new TypeToken<List<Grupo>>() {
+        }.getType());
+
+        for (int i = 0; i < grupos.size(); i++) {
+            nombre_asignatura_grupo.add(asignatura_seleccionada.getNombre_materia());
+        }
+
+        if (asignatura_seleccionada.getNombre_materia() != null && !grupos.isEmpty()) {
+            lstGrupos.setAdapter(new Grupos_Adapter(Add_Edit_Asignaturas.this, grupos, nombre_asignatura_grupo, Add_Edit_Asignaturas.this));
+        } else {
+            getGrupos_General();
+        }
+
+
+    }
+
+    /**
+     * En el caso de que se vaya a crear una nueva asignatura o se vayan a actualizar los campos de una asignatura
+     * esta funcion checa si los campos estan o no vacios
+     *
+     * @return True si es que ningun campo está vacio; False si alguno de los 2 esta vacio
+     */
+    private boolean validateFiedlsAsignaturas() {
+        return !etCod_Asig.getText().toString().isEmpty() || !etNombre_Asig.getText().toString().isEmpty();
+    }
+
+    /**
+     * ItemListener de la clase {@link Grupos_Adapter}
+     * Funciona para ir acumulando los grupos que se desean agregar a una asignatura sin grupos
+     *
+     * @param grupo_seleccionado --> Devuelve el grupo seleccionado
+     * @param asignatura_grupo   --> Devuelve el nombre de la asignatura en el que está tal grupo
+     */
+    @Override
+    public void OnItemGroupSelected(Grupo grupo_seleccionado, String asignatura_grupo) {
+        //this.grupo_seleccionado = grupo_seleccionado;
+        //Toasty.success(Add_Edit_Asignaturas.this, "Se ha seleccionado el grupo " + grupo_seleccionado.getNombre_grupo()).show();
+        grupos_to_add.add(grupo_seleccionado);
+    }
+
+    /**
+     * ItemListener de la clase {@link Grupos_Adapter}
+     * Funciona para eliminar el grupo de la lista de "grupos a agregar" a una asignatura sin grupos
+     *
+     * @param grupo_seleccionado --> El grupo que se desea eliminar
+     * @param grupo_asignatura   --> La Asignatura donde se encuentra el grupo
+     */
+    @Override
+    public void OnItemGroupDeselected(Grupo grupo_seleccionado, String grupo_asignatura) {
+        //Toasty.success(Add_Edit_Asignaturas.this, "Se ha deseleccionado el grupo " + grupo_seleccionado.getNombre_grupo()).show();
+        grupos_to_add.remove(grupo_seleccionado);
+    }
+
+    /**
+     * Item
+     * @param grupos_seleccionados
+     */
+    private void DeleteGroup(List<Grupo> grupos_seleccionados) {
+        StringBuilder grupos_string = new StringBuilder();
+        List<Grupo> grupos_temporal = new Gson().fromJson(asignatura_seleccionada.getGrupos(), new TypeToken<List<Grupo>>() {
+        }.getType());
+
+        int index = asignaturas.indexOf(asignatura_seleccionada);
+        asignaturas_original.remove(index);
+
+        for (int i = 0; i < grupos_seleccionados.size(); i++) {
+            Grupo grupo = grupos_seleccionados.get(i);
+            grupos_string.append(grupo.getNombre_grupo()).append(" ");
+            for (int j = 0; j < grupos_temporal.size(); j++) {
+                if (grupos_temporal.get(j).getNombre_grupo().equals(grupo.getNombre_grupo())) {
+                    System.out.println("Se ha encontrado una coincidencia");
+                    grupos_temporal.remove(j);
+                }
+            }
+        }
+
+        new AlertDialog.Builder(Add_Edit_Asignaturas.this)
+                .setTitle(getResources().getString(R.string.header_warning))
+                .setMessage(getResources().getString(R.string.warning_del_grupo, grupos_string.toString(), asignatura_seleccionada.getNombre_materia()))
+                .setNegativeButton(getResources().getString(R.string.cancelar), (dialog, which) -> dialog.dismiss())
+                .setPositiveButton(getResources().getString(R.string.lblEliminar_Grupo), (dialog, which) -> {
+                    JsonArray grupos_list = (JsonArray) new Gson().toJsonTree(grupos_temporal, new TypeToken<List<Grupo>>() {
+                    }.getType());
+
+                    asignatura_seleccionada.setGrupos(grupos_list);
+
+                    asignaturas_original.add(index, asignatura_seleccionada);
+
+                    loadDataAsignatura(asignatura_seleccionada);
+
+                }).create().show();
+    }
+
+    private void DeleteAsignatura(Asignatura asignatura_seleccionada) {
+
+        new AlertDialog.Builder(Add_Edit_Asignaturas.this)
+                .setTitle(getResources().getString(R.string.header_warning))
+                .setMessage(getResources().getString(R.string.warning_del_asignatura, asignatura_seleccionada.getNombre_materia()))
+                .setNegativeButton(getResources().getString(R.string.cancelar), (dialog, which) -> dialog.dismiss())
+                .setPositiveButton(getResources().getString(R.string.btnEliminar_Asignatura), (dialog, which) -> {
+                    asignaturas.remove(asignatura_seleccionada);
+                    ArrayDeque<Asignatura> asignaturas_original_temp = new ArrayDeque<>(asignaturas);
+                    Add_Edit_Asignaturas.this.asignatura_seleccionada = asignaturas_original_temp.getLast();
+                    asignaturas_original_temp.removeLast();
+                    asignaturas_original.clear();
+                    asignaturas_original.addAll(asignaturas_original_temp);
+                    spAsignaturas.setAdapter(new Spinner_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
+                    loadDataAsignatura(Add_Edit_Asignaturas.this.asignatura_seleccionada);
+                    isForUpdate = true;
+                }).create().show();
+    }
+
+    @Override
+    public void OnAsignaturaSelected(Asignatura asignatura_seleccionado) {
+        //Toasty.info(Add_Edit_Asignaturas.this, "Se ha agregado a la lista").show();
+        ArrayDeque<Asignatura> asignaturas_original_temp = new ArrayDeque<>(asignaturas);
+        asignaturas_original_temp.removeLast();
+        asignaturas.add(asignaturas_original_temp.size(), asignatura_seleccionado);
+        asignaturas_original.add(asignatura_seleccionado);
+        ArrayDeque<Asignatura> asignaturas_temp = new ArrayDeque<>(asignaturas);
+        asignatura_seleccionada = asignaturas_temp.getLast();
+        spAsignaturas.setAdapter(new Spinner_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
+        loadDataAsignatura(asignatura_seleccionada);
+        isForUpdate = true;
+    }
+
+    @Override
+    public void OnAsignaturaDeselected(Asignatura asignatura_seleccionado) {
+        Toasty.info(Add_Edit_Asignaturas.this, "Se ha eliminado de la lista").show();
+
+        asignaturas.remove(asignatura_seleccionado);
+        asignaturas_original.remove(asignatura_seleccionado);
+        ArrayDeque<Asignatura> asignaturas_temp = new ArrayDeque<>(asignaturas);
+        asignatura_seleccionada = asignaturas_temp.getLast();
+        loadDataAsignatura(asignatura_seleccionada);
+        spAsignaturas.setAdapter(new Spinner_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
+        isForUpdate = true;
+
+    }
+
+    //TODO FIX THIS
+    /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -303,130 +584,6 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
         return res;
     }
 
-
-    private void getGrupos_General() {
-        List<Grupo> grupos_general = new LinkedList<>();
-        List<List<Grupo>> grupos_List = new LinkedList<>();
-        nombre_asignatura_grupo.clear();
-        txtTipo_Grupo.setText(getResources().getString(R.string.lblGrupos_General));
-        for (int i = 0; i < asignaturas.size(); i++) {
-            grupos_List.add(new Gson().fromJson(asignaturas.get(i).getGrupos(), new TypeToken<List<Grupo>>() {
-            }.getType()));
-            for (int j = 0; j < grupos_List.get(i).size(); j++) {
-                nombre_asignatura_grupo.add(asignaturas.get(i).getNombre_materia());
-            }
-        }
-
-        for (int i = 0; i < grupos_List.size(); i++) {
-            grupos_general.addAll(grupos_List.get(i));
-        }
-
-
-        lstGrupos.setAdapter(new Grupos_Adapter(Add_Edit_Asignaturas.this, grupos_general, nombre_asignatura_grupo, Add_Edit_Asignaturas.this));
-
-    }
-
-    private void loadDataAsignatura(Asignatura asignatura) {
-        txtTipo_Grupo.setText(getResources().getString(R.string.lblGrupos_Asignatura));
-        asignatura_seleccionada = asignatura;
-        etCod_Asig.setText(asignatura_seleccionada.getCodigo_materia());
-        etNombre_Asig.setText(asignatura_seleccionada.getNombre_materia());
-        nombre_asignatura_grupo.clear();
-        if (asignatura_seleccionada.getImagen_materia() != null) {
-            String url = new ApiWeb().getBASE_URL_GLITCH() + "/" + asignatura_seleccionada.getImagen_materia();
-            Glide.with(Add_Edit_Asignaturas.this).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(url).into(imgAsignatura);
-        } else {
-            Glide.with(Add_Edit_Asignaturas.this).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(Add_Edit_Asignaturas.this.getDrawable(R.drawable.materia_holder)).into(imgAsignatura);
-        }
-
-        grupos.clear();
-
-        grupos = new Gson().fromJson(asignatura_seleccionada.getGrupos(), new TypeToken<List<Grupo>>() {
-        }.getType());
-
-        for (int i = 0; i < grupos.size(); i++) {
-            nombre_asignatura_grupo.add(asignatura_seleccionada.getNombre_materia());
-        }
-
-        if (asignatura_seleccionada.getNombre_materia() != null && !grupos.isEmpty()) {
-            lstGrupos.setAdapter(new Grupos_Adapter(Add_Edit_Asignaturas.this, grupos, nombre_asignatura_grupo, Add_Edit_Asignaturas.this));
-        } else {
-            getGrupos_General();
-        }
-
-
-    }
-
-    private boolean validateFiedlsAsignaturas() {
-        return !etCod_Asig.getText().toString().isEmpty() || !etNombre_Asig.getText().toString().isEmpty();
-    }
-
-    @Override
-    public void OnItemGroupSelected(Grupo grupo_seleccionado, String asignatura_grupo) {
-        //this.grupo_seleccionado = grupo_seleccionado;
-        //Toasty.success(Add_Edit_Asignaturas.this, "Se ha seleccionado el grupo " + grupo_seleccionado.getNombre_grupo()).show();
-        grupos_to_add.add(grupo_seleccionado);
-    }
-
-    @Override
-    public void OnItemGroupDeselected(Grupo grupo_seleccionado, String grupo_asignatura) {
-        //Toasty.success(Add_Edit_Asignaturas.this, "Se ha deseleccionado el grupo " + grupo_seleccionado.getNombre_grupo()).show();
-        grupos_to_add.remove(grupo_seleccionado);
-    }
-
-    private void DeleteGroup(List<Grupo> grupos_seleccionados) {
-        StringBuilder grupos_string = new StringBuilder();
-
-        for (Grupo grupo : grupos_seleccionados) {
-            grupos_string.append(grupo.getNombre_grupo()).append(" ");
-        }
-
-        new AlertDialog.Builder(Add_Edit_Asignaturas.this)
-                .setTitle(getResources().getString(R.string.header_warning))
-                .setMessage(getResources().getString(R.string.warning_del_grupo, grupos_string.toString(), asignatura_seleccionada.getNombre_materia()))
-                .setNegativeButton(getResources().getString(R.string.cancelar), (dialog, which) -> dialog.dismiss())
-                .setPositiveButton(getResources().getString(R.string.btnEliminar_Grupo), (dialog, which) -> {
-                    //Toasty.info(Add_Edit_Asignaturas.this, "Se ha eliminado").show();
-
-                    List<Grupo> grupos = new Gson().fromJson(asignatura_seleccionada.getGrupos(), new TypeToken<List<Grupo>>() {
-                    }.getType());
-
-                    for (Grupo grupo_eliminar : grupos_seleccionados) {
-                        grupos.remove(grupo_eliminar);
-                    }
-
-                    JsonArray grupos_list = (JsonArray) new Gson().toJsonTree(grupos, new TypeToken<List<Grupo>>() {
-                    }.getType());
-
-                    asignatura_seleccionada.setGrupos(grupos_list);
-
-                    List<Grupo> grupos_temp = new Gson().fromJson(asignatura_seleccionada.getGrupos(), new TypeToken<List<Grupo>>() {
-                    }.getType());
-
-                    for (Grupo grupo_temp : grupos_temp) {
-                        System.out.println(grupo_temp.getNombre_grupo());
-                    }
-
-                    //loadDataAsignatura(asignatura_seleccionada);
-
-
-                }).create().show();
-    }
-
-    private void DeleteAsignatura(Asignatura asignatura_seleccionada) {
-        new AlertDialog.Builder(Add_Edit_Asignaturas.this)
-                .setTitle(getResources().getString(R.string.header_warning))
-                .setMessage(getResources().getString(R.string.warning_del_asignatura, asignatura_seleccionada.getNombre_materia()))
-                .setNegativeButton(getResources().getString(R.string.cancelar), (dialog, which) -> dialog.dismiss())
-                .setPositiveButton(getResources().getString(R.string.btnEliminar_Asignatura), (dialog, which) -> {
-                    Toasty.info(Add_Edit_Asignaturas.this, "Se ha eliminado").show();
-                    asignaturas_original.remove(asignatura_seleccionada);
-                    asignaturas.remove(asignatura_seleccionada);
-                    spAsignaturas.setAdapter(new Spinner_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
-                    getGrupos_General();
-
-                }).create().show();
-    }
-
+ */
 
 }

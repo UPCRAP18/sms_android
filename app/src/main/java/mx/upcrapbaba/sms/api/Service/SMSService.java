@@ -2,6 +2,10 @@ package mx.upcrapbaba.sms.api.Service;
 
 import com.google.gson.JsonObject;
 
+import java.util.List;
+
+import mx.upcrapbaba.sms.models.Asignatura;
+import mx.upcrapbaba.sms.models.Grupo;
 import mx.upcrapbaba.sms.models.User;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -22,6 +26,20 @@ public interface SMSService {
     })
     @GET("/usuarios/{id}")
     Call<User> getUserInfo(@Header("Authorization") String token, @Path("id") String id_usuario);
+
+    @Headers({
+            "Content-Type: application/json",
+            "Accept: application/json "
+    })
+    @GET("/grupos/")
+    Call<List<Grupo>> getAllGroups(@Header("Authorization") String token);
+
+    @Headers({
+            "Content-Type: application/json",
+            "Accept: application/json "
+    })
+    @GET("/materias/")
+    Call<List<Asignatura>> getAllAsignaturas(@Header("Authorization") String token);
 
 
     /* Peticiones POST a sms-api-v1 */

@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -29,14 +30,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import es.dmoral.toasty.Toasty;
 import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
+import kotlin.Unit;
 import mx.upcrapbaba.sms.R;
 import mx.upcrapbaba.sms.adaptadores.Alumnos_Adapter;
 import mx.upcrapbaba.sms.adaptadores.Spinner_Adapter;
 import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.api.Service.SMSService;
 import mx.upcrapbaba.sms.extras.Alert_Dialog;
+import mx.upcrapbaba.sms.extras.NetworkStatus;
 import mx.upcrapbaba.sms.models.Alumno;
 import mx.upcrapbaba.sms.models.Asignatura;
 import mx.upcrapbaba.sms.models.Grupo;
@@ -65,9 +67,38 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
     private List<String> nombre_grupos = new LinkedList<>();
     private int RESULT_POPUP = 0;
 
+    /**
+     * Comprueba el estado de la red del telefono
+     * Para mas informacion ver:
+     * {@link NetworkStatus#getTypeConnection()}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        MaterialDialog mDialog = new MaterialDialog(this);
+        mDialog.title(R.string.header_warning, null);
+        mDialog.cancelOnTouchOutside(false);
+
+        if (new NetworkStatus(this).getTypeConnection() == 0) {
+            mDialog.message(R.string.no_Net, null, false, 1);
+            mDialog.negativeButton(R.string.reintentar, null, materialDialog -> {
+                startActivity(new Intent(this, Inicio.class));
+                this.overridePendingTransition(0, 0);
+                this.finish();
+                return Unit.INSTANCE;
+            });
+            mDialog.show();
+        } else {
+            loadDataContent();
+        }
+
+    }
+
+    /**
+     * Una vez que se ha evaluado la conexion a internet, si es correcta, se cargan los datos y el layout
+     */
+    private void loadDataContent() {
         setContentView(R.layout.activity_inicio);
 
         SMSService sms_service = ApiWeb.getApi(new ApiWeb().getBASE_URL_GLITCH()).create(SMSService.class);
@@ -78,7 +109,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
 
         nav_bar = findViewById(R.id.bottom_nav_bar);
 
-        nav_bar.setSelectedIndex(0, true);
+        nav_bar.setDefaultSelectedIndex(0);
 
         nav_bar.setMenuItemSelectionListener(this);
 
@@ -122,15 +153,28 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
             Alert_Dialog.showErrorMessage(this);
         }
 
-
     }
 
+    /**
+     * Actualiza la interfaz al regresar de un intent, ya que actualicé los datos en la seccion de edicion
+     *
+     * @param requestCode --> Valor que pido
+     * @param resultCode  --> Valor de resultado
+     * @param data        --> Datos opcionales que paso
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         this.recreate();
     }
 
+    /**
+     * Recarga la pagina cuando se es reseleccionado un boton de la barra de navegacion inferior
+     *
+     * @param i  --> Indice previo
+     * @param i1 --> Nuevo indice de seleccion
+     * @param b  --> Animado
+     */
     @Override
     public void onMenuItemReselect(int i, int i1, boolean b) {
         startActivity(new Intent(this, Inicio.class));
@@ -138,11 +182,26 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         this.finish();
     }
 
+    /**
+     * Navegacion de la barra inferior
+     *
+     * @param i  --> Indice previamente seleccionado
+     * @param i1 --> Indice seleccionado
+     * @param b  --> Animacion (Cierto o falso)
+     */
+    //TODO Actualizar para lograr la navegacion
     @Override
     public void onMenuItemSelect(int i, int i1, boolean b) {
         nav_bar.setSelectedIndex(i);
+        nav_bar.setSelected(true);
     }
 
+    /**
+     * Obtiene los datos del servidor mediante una request.
+     * Los datos que obtiene los guarda en el modelo y empieza a actualizar la UI con los valores
+     *
+     * @param sms_service --> Servicio estatico de la interfaz para realizar las peticiones
+     */
     private void getUserInfo(SMSService sms_service) {
         Call<User> user_info = sms_service.getUserInfo(token, id_usuario);
 
@@ -175,18 +234,24 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
                 } else {
                     System.out.println(response.errorBody());
                     pbar.smoothToHide();
-                    Toasty.warning(Inicio.this, "Ha ocurrido un error").show();
+                    Alert_Dialog.showErrorMessage(Inicio.this);
                 }
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
+                pbar.smoothToHide();
+                Alert_Dialog.showErrorMessage(Inicio.this);
                 System.out.println(t.toString());
             }
         });
 
     }
 
+    /**
+     * Evento onItemSelectedListener del spinner de Asignaturas
+     * Carga los grupos que tiene esa asignatura
+     */
     private void setOnSelectedListener() {
         spAsignaturas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -226,6 +291,9 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         });
     }
 
+    /**
+     * Actualiza la lista de alumnos con los valores que tiene el grupo
+     */
     private void setAlumnos() {
         spGrupos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -260,6 +328,13 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         });
     }
 
+    /**
+     * Infla/Carga el layout de la barra de titulo a manera de que soporte el imageview
+     * con la imagen de perfil del usuario
+     *
+     * @param menu --> Menu que se está sobreescribiendo
+     * @return --> True si es que está inflado
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.user_menu, menu);
@@ -279,6 +354,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
 
         return true;
     }
+
 
 }
 

@@ -56,6 +56,7 @@
     <string name="header_warning">¡Advertencia!</string>
     <string name="warning_del_grupo">¿Esta seguro de querer eliminar al grupo %s de la asignatura %s?</string>
     <string name="warning_del_asignatura">¿Esta seguro de querer eliminar la asignatura %s?</string>
+    <string name="warn_update_asign">¿Esta seguro de querer actualizar los datos?</string>
 
     <!-- Notificacion de Red -->
     <string name="use_data">Usted está utilizando red de datos</string>
@@ -71,7 +72,8 @@
     <string name="btnSeleccionar">Seleccionar</string>
     <string name="ht_nombre_asig">Nombre de Asignatura</string>
     <string name="ht_cod_asig">Codigo de Asignatura</string>
-    <string name="btnEliminar_Grupo">Eliminar Grupo/s</string>
+    <string name="btnEliminar_Grupo">Eliminar \n Grupo/s</string>
+    <string name="lblEliminar_Grupo">Eliminar Grupo/s</string>
     <string name="btnEliminar_Asignatura">Eliminar Asignatura</string>
     <string name="btnSave">Guardar</string>
     <string name="err_Add_Edit_Asignatura">Por favor ingrese la informacion solicitada</string>
@@ -80,5 +82,5 @@
     <string name="warning_notSel_Asignatura_Del">Por favor seleccione una asignatura para eliminar</string>
     <string name="lblGrupos_Asignatura">Grupos de la asignatura</string>
     <string name="lblGrupos_General">Añadir grupo/s</string>
-
+    <string name="lblAsignaturas_Online">Asignaturas en la nube</string>
 </resources>

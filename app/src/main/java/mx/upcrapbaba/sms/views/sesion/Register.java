@@ -13,9 +13,11 @@ import com.wang.avi.AVLoadingIndicatorView;
 import java.util.Objects;
 
 import es.dmoral.toasty.Toasty;
+import kotlin.Unit;
 import mx.upcrapbaba.sms.R;
 import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.api.Service.SMSService;
+import mx.upcrapbaba.sms.extras.Alert_Dialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -25,7 +27,6 @@ public class Register extends AppCompatActivity {
     private MaterialEditText etUsr_Nombre, etUsr_Aps, etUsr_Matricula, etUsr_Email, etUsr_Pwd;
     private AVLoadingIndicatorView pbar;
     private SMSService sms_service;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +84,11 @@ public class Register extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Call<JsonObject> call, Throwable t) {
-                        Toasty.warning(Register.this, getResources().getString(R.string.request_error)).show();
+                        Alert_Dialog.showWarnMessage(Register.this, getString(R.string.header_warning), getString(R.string.request_error))
+                                .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                    Register.this.recreate();
+                                    return Unit.INSTANCE;
+                                }).show();
                         System.out.println(t.toString());
                         pbar.smoothToHide();
                     }

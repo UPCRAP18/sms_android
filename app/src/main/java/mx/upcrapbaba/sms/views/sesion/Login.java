@@ -10,12 +10,16 @@ import com.google.gson.JsonObject;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.wang.avi.AVLoadingIndicatorView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 import es.dmoral.toasty.Toasty;
+import kotlin.Unit;
 import mx.upcrapbaba.sms.R;
 import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.api.Service.SMSService;
+import mx.upcrapbaba.sms.extras.Alert_Dialog;
 import mx.upcrapbaba.sms.sqlite.DBHelper;
 import mx.upcrapbaba.sms.views.inicio.Inicio;
 import retrofit2.Call;
@@ -27,6 +31,8 @@ public class Login extends AppCompatActivity {
     private MaterialEditText etUsuario, etPwd;
     private AVLoadingIndicatorView pbar;
     private SMSService sms_service;
+
+    //TODO Arreglar el restablecimiento de contraseña
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,22 +76,27 @@ public class Login extends AppCompatActivity {
 
                 login_user.enqueue(new Callback<JsonObject>() {
                     @Override
-                    public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
                         if (response.isSuccessful() && response.body() != null) {
-                            Toasty.success(Login.this, response.body().get("message").toString()).show();
-                            System.out.println("Se ha iniciado sesion correctamente");
 
-                            DBHelper dbHelper = new DBHelper(Login.this);
-
-                            String token = response.body().get("token").toString().replaceAll("\"", "");
-                            String id_usuario = response.body().get("id").toString().replaceAll("\"", "");
-
-                            if (dbHelper.addCredentials(id_usuario, token)) {
-                                startActivity(new Intent(Login.this, Inicio.class));
-                                overridePendingTransition(0, 0);
-                                Login.this.finish();
+                            if (response.body().get("token") == null) {
+                                Toasty.error(Login.this, response.body().get("message").toString()).show();
                             } else {
-                                Toasty.warning(Login.this, getResources().getString(R.string.error_db)).show();
+                                Toasty.success(Login.this, response.body().get("message").toString()).show();
+                                //System.out.println("Se ha iniciado sesion correctamente");
+
+                                DBHelper dbHelper = new DBHelper(Login.this);
+
+                                String token = response.body().get("token").toString().replaceAll("\"", "");
+                                String id_usuario = response.body().get("id").toString().replaceAll("\"", "");
+
+                                if (dbHelper.addCredentials(id_usuario, token)) {
+                                    startActivity(new Intent(Login.this, Inicio.class));
+                                    overridePendingTransition(0, 0);
+                                    Login.this.finish();
+                                } else {
+                                    Toasty.warning(Login.this, getResources().getString(R.string.error_db)).show();
+                                }
                             }
 
                         } else {
@@ -95,13 +106,16 @@ public class Login extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<JsonObject> call, Throwable t) {
-                        Toasty.warning(Login.this, getResources().getString(R.string.request_error)).show();
+                    public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+                        Alert_Dialog.showWarnMessage(Login.this, getString(R.string.header_warning), getString(R.string.request_error))
+                                .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                    Login.this.recreate();
+                                    return Unit.INSTANCE;
+                                }).show();
                         System.out.println(t.toString());
                         pbar.smoothToHide();
                     }
                 });
-
 
             } else {
                 Toasty.error(this, getResources().getString(R.string.fields_error)).show();

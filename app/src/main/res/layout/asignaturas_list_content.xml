@@ -6,12 +6,12 @@
     android:orientation="horizontal">
 
     <CheckBox
-        android:id="@+id/cboGrupo"
+        android:id="@+id/cboAsignatura"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginEnd="6dp"
         android:layout_weight="2"
-        android:text="@string/lblGrupos_Asignatura"
+        android:text="@string/lblAsignaturas"
         android:textSize="14sp" />
 
 </LinearLayout>

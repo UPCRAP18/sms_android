@@ -13,9 +13,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:fullBackupContent="@xml/backup_descriptor"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
         <activity
             android:name=".views.personalizacion.Add_Edit_Asignaturas"
+            android:windowSoftInputMode="adjustPan|adjustResize"
             android:parentActivityName=".views.inicio.Inicio" />
         <activity
             android:name=".views.user_settings.User_Profile"
