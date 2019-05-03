@@ -1,6 +1,5 @@
-package mx.upcrapbaba.sms.adaptadores;
+package mx.upcrapbaba.sms.adaptadores.listviews;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.view.LayoutInflater;
@@ -12,19 +11,21 @@ import android.widget.ListAdapter;
 import java.util.List;
 
 import mx.upcrapbaba.sms.R;
-import mx.upcrapbaba.sms.models.Asignatura;
+import mx.upcrapbaba.sms.models.Grupo;
 
-public class Asignaturas_Adapter implements ListAdapter {
+public class Grupos_Edit_Adapter implements ListAdapter {
 
-    private Context mContext;
-    private List<Asignatura> dataSet;
-    private Asignaturas_Adapter.AsignaturaListener setOnItemAsignaturaSelected;
+    Context mContext;
+    List<Grupo> dataSet;
+    List<String> nombres_asignatura;
+    Grupos_Edit_Adapter.GroupListener setOnItemGroupSelected;
 
 
-    public Asignaturas_Adapter(Context mContext, List<Asignatura> dataSet, AsignaturaListener setOnItemAsignaturaSelected) {
+    public Grupos_Edit_Adapter(Context mContext, List<Grupo> dataSet, List<String> nombres_asignatura, GroupListener setOnItemGroupSelected) {
         this.mContext = mContext;
         this.dataSet = dataSet;
-        this.setOnItemAsignaturaSelected = setOnItemAsignaturaSelected;
+        this.nombres_asignatura = nombres_asignatura;
+        this.setOnItemGroupSelected = setOnItemGroupSelected;
     }
 
     @Override
@@ -67,22 +68,21 @@ public class Asignaturas_Adapter implements ListAdapter {
         return false;
     }
 
-    @SuppressLint("InflateParams")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Asignatura asignatura_actual = dataSet.get(position);
+        Grupo grupo_actual = dataSet.get(position);
         if (convertView == null) {
             LayoutInflater layoutInflater = LayoutInflater.from(mContext);
-            convertView = layoutInflater.inflate(R.layout.asignaturas_list_content, null);
+            convertView = layoutInflater.inflate(R.layout.grupos_list_content, null);
 
-            CheckBox cboAsignatura = convertView.findViewById(R.id.cboAsignatura);
+            CheckBox cboGrupo = convertView.findViewById(R.id.cboGrupo);
 
-            cboAsignatura.setText(String.format("%s - %s", asignatura_actual.getCodigo_materia(), asignatura_actual.getNombre_materia()));
-            cboAsignatura.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            cboGrupo.setText(String.format("%s - %s", grupo_actual.getNombre_grupo(), nombres_asignatura.get(position)));
+            cboGrupo.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
-                    setOnItemAsignaturaSelected.OnAsignaturaSelected(asignatura_actual);
+                    setOnItemGroupSelected.OnItemGroupSelected(grupo_actual, nombres_asignatura.get(position));
                 } else {
-                    setOnItemAsignaturaSelected.OnAsignaturaDeselected(asignatura_actual);
+                    setOnItemGroupSelected.OnItemGroupDeselected(grupo_actual, nombres_asignatura.get(position));
                 }
             });
 
@@ -106,11 +106,10 @@ public class Asignaturas_Adapter implements ListAdapter {
         return false;
     }
 
-    public interface AsignaturaListener {
-        void OnAsignaturaSelected(Asignatura asignatura_seleccionado);
+    public interface GroupListener {
+        void OnItemGroupSelected(Grupo grupo_seleccionado, String grupo_asignatura);
 
-        void OnAsignaturaDeselected(Asignatura asignatura_seleccionado);
+        void OnItemGroupDeselected(Grupo grupo_seleccionado, String grupo_asignatura);
     }
-
 
 }

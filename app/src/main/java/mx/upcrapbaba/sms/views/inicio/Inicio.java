@@ -33,8 +33,8 @@ import java.util.List;
 import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
 import kotlin.Unit;
 import mx.upcrapbaba.sms.R;
-import mx.upcrapbaba.sms.adaptadores.Alumnos_Adapter;
-import mx.upcrapbaba.sms.adaptadores.Spinner_Adapter;
+import mx.upcrapbaba.sms.adaptadores.listviews.Alumnos_GeneralList_Adapter;
+import mx.upcrapbaba.sms.adaptadores.spinners.Asignaturas_General_Adapter;
 import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.api.Service.SMSService;
 import mx.upcrapbaba.sms.extras.Alert_Dialog;
@@ -45,6 +45,7 @@ import mx.upcrapbaba.sms.models.Grupo;
 import mx.upcrapbaba.sms.models.User;
 import mx.upcrapbaba.sms.sqlite.DBHelper;
 import mx.upcrapbaba.sms.views.personalizacion.Add_Edit_Asignaturas;
+import mx.upcrapbaba.sms.views.personalizacion.Add_Edit_Grupos;
 import mx.upcrapbaba.sms.views.user_settings.User_Profile;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -138,7 +139,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         });
 
         fab_Add_Grupo.setOnClickListener(v -> {
-
+            startActivityForResult(new Intent(Inicio.this, Add_Edit_Grupos.class).putExtra("SELECCIONADO", "Grupos"), RESULT_POPUP);
         });
 
         Toolbar toolbar = findViewById(R.id.ToolBar);
@@ -227,7 +228,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
                         spAsignaturas.setEnabled(false);
                         pbar.smoothToHide();
                     } else {
-                        spAsignaturas.setAdapter(new Spinner_Adapter(Inicio.this, R.layout.asignatura_item, asignaturas));
+                        spAsignaturas.setAdapter(new Asignaturas_General_Adapter(Inicio.this, R.layout.asignatura_item, asignaturas));
                         setOnSelectedListener();
                     }
 
@@ -315,7 +316,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
                     anim_empty_list.setVisibility(View.GONE);
                     txtError_Message.setVisibility(View.GONE);
                     lblAlumnos.setVisibility(View.VISIBLE);
-                    lstAlumnos.setAdapter(new Alumnos_Adapter(alumnos, Inicio.this));
+                    lstAlumnos.setAdapter(new Alumnos_GeneralList_Adapter(alumnos, Inicio.this));
                     pbar.smoothToHide();
                 }
 

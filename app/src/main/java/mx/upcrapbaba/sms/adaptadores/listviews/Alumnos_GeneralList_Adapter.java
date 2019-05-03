@@ -1,4 +1,4 @@
-package mx.upcrapbaba.sms.adaptadores;
+package mx.upcrapbaba.sms.adaptadores.listviews;
 
 import android.content.Context;
 import android.database.DataSetObserver;
@@ -19,11 +19,11 @@ import mx.upcrapbaba.sms.R;
 import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.models.Alumno;
 
-public class Alumnos_Adapter implements ListAdapter {
+public class Alumnos_GeneralList_Adapter implements ListAdapter {
     private List<Alumno> dataSet;
     private Context mContext;
 
-    public Alumnos_Adapter(List<Alumno> dataSet, Context mContext) {
+    public Alumnos_GeneralList_Adapter(List<Alumno> dataSet, Context mContext) {
         this.dataSet = dataSet;
         this.mContext = mContext;
     }

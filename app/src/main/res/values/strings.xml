@@ -86,4 +86,15 @@
     <string name="lblGrupos_General">Añadir grupo/s</string>
     <string name="lblAsignaturas_Online">Asignaturas en la nube</string>
     <string name="title_activity_add__edit__grupos">Add_Edit_Grupos</string>
+
+
+    <!-- Añadir/Editar Grupos -->
+    <string name="ht_nombre_grupo">Nombre de Grupo</string>
+    <string name="lblAlumnos_Grupo">Alumnos inscritos</string>
+    <string name="lblCriterios_Grupo">Editar criterios del grupo</string>
+    <string name="lblAlumnos_Nube">Alumnos en la nube</string>
+    <string name="btnDelete_Grupo">Eliminar \n Grupo</string>
+    <string name="btnDelete_Alumnos">Eliminar   alumno/s</string>
+
+
 </resources>

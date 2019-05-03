@@ -14,7 +14,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.Gson;
@@ -31,9 +30,9 @@ import java.util.List;
 import es.dmoral.toasty.Toasty;
 import kotlin.Unit;
 import mx.upcrapbaba.sms.R;
-import mx.upcrapbaba.sms.adaptadores.Asignaturas_Adapter;
-import mx.upcrapbaba.sms.adaptadores.Grupos_Adapter;
-import mx.upcrapbaba.sms.adaptadores.Spinner_Adapter;
+import mx.upcrapbaba.sms.adaptadores.listviews.Asignaturas_Edit_Adapter;
+import mx.upcrapbaba.sms.adaptadores.listviews.Grupos_Edit_Adapter;
+import mx.upcrapbaba.sms.adaptadores.spinners.Asignaturas_General_Adapter;
 import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.api.Service.SMSService;
 import mx.upcrapbaba.sms.extras.Alert_Dialog;
@@ -45,7 +44,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Adapter.GroupListener, Asignaturas_Adapter.AsignaturaListener {
+public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Edit_Adapter.GroupListener, Asignaturas_Edit_Adapter.AsignaturaListener {
 
     private String SELECCIONADO = "", token = "";
     private User user_data;
@@ -134,13 +133,13 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
             }
         });
 
-        btnSeleccionar_Asignatura = findViewById(R.id.btnSelect_Edit);
+        btnSeleccionar_Asignatura = findViewById(R.id.btnSelect_Grupo_Edit);
 
         sms_service.getAllAsignaturas(token).enqueue(new Callback<List<Asignatura>>() {
             @Override
             public void onResponse(@NotNull Call<List<Asignatura>> call, @NotNull Response<List<Asignatura>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    lstAsignaturas.setAdapter(new Asignaturas_Adapter(Add_Edit_Asignaturas.this, response.body(), Add_Edit_Asignaturas.this));
+                    lstAsignaturas.setAdapter(new Asignaturas_Edit_Adapter(Add_Edit_Asignaturas.this, response.body(), Add_Edit_Asignaturas.this));
                 } else {
                     Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
                             .positiveButton(R.string.aceptar, null, materialDialog -> {
@@ -180,7 +179,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
 
                     asignaturas.add(new Asignatura("", "Agregar nueva asignatura", "", new JsonArray()));
 
-                    spAsignaturas.setAdapter(new Spinner_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
+                    spAsignaturas.setAdapter(new Asignaturas_General_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
 
                     btnSeleccionar_Asignatura.setOnClickListener(v -> {
                         if (spAsignaturas.getSelectedItemPosition() != (asignaturas.size() - 1)) {
@@ -424,7 +423,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
                         nombre_asignatura_grupo.add("Servidor");
                     }
 
-                    lstGrupos.setAdapter(new Grupos_Adapter(Add_Edit_Asignaturas.this, grupos_general, nombre_asignatura_grupo, Add_Edit_Asignaturas.this));
+                    lstGrupos.setAdapter(new Grupos_Edit_Adapter(Add_Edit_Asignaturas.this, grupos_general, nombre_asignatura_grupo, Add_Edit_Asignaturas.this));
                 } else {
                     Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
                             .positiveButton(R.string.aceptar, null, materialDialog -> {
@@ -477,7 +476,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
         }
 
         if (asignatura_seleccionada.getNombre_materia() != null && !grupos.isEmpty()) {
-            lstGrupos.setAdapter(new Grupos_Adapter(Add_Edit_Asignaturas.this, grupos, nombre_asignatura_grupo, Add_Edit_Asignaturas.this));
+            lstGrupos.setAdapter(new Grupos_Edit_Adapter(Add_Edit_Asignaturas.this, grupos, nombre_asignatura_grupo, Add_Edit_Asignaturas.this));
         } else {
             getGrupos_General();
         }
@@ -496,7 +495,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
     }
 
     /**
-     * ItemListener de la clase {@link Grupos_Adapter}
+     * ItemListener de la clase {@link Grupos_Edit_Adapter}
      * Funciona para ir acumulando los grupos que se desean agregar a una asignatura sin grupos
      *
      * @param grupo_seleccionado --> Devuelve el grupo seleccionado
@@ -508,7 +507,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
     }
 
     /**
-     * ItemListener de la clase {@link Grupos_Adapter}
+     * ItemListener de la clase {@link Grupos_Edit_Adapter}
      * Funciona para eliminar el grupo de la lista de "grupos a agregar" a una asignatura sin grupos
      *
      * @param grupo_seleccionado --> El grupo que se desea eliminar
@@ -576,7 +575,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
                     asignaturas_original_temp.removeLast();
                     asignaturas_original.clear();
                     asignaturas_original.addAll(asignaturas_original_temp);
-                    spAsignaturas.setAdapter(new Spinner_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
+                    spAsignaturas.setAdapter(new Asignaturas_General_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
                     loadDataAsignatura(Add_Edit_Asignaturas.this.asignatura_seleccionada);
                     isForUpdate = true;
                 }).create().show();
@@ -584,7 +583,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
 
     /**
      * ItemListener para las asignaturas, añade la asignatura desde el servidor al arreglo
-     * para mas informacion ver {@link Asignaturas_Adapter}
+     * para mas informacion ver {@link Asignaturas_Edit_Adapter}
      * @param asignatura_seleccionado --> Asignatura seleccionada
      */
     @Override
@@ -595,7 +594,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
         asignaturas_original.add(asignatura_seleccionado);
         ArrayDeque<Asignatura> asignaturas_temp = new ArrayDeque<>(asignaturas);
         asignatura_seleccionada = asignaturas_temp.getLast();
-        spAsignaturas.setAdapter(new Spinner_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
+        spAsignaturas.setAdapter(new Asignaturas_General_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
         loadDataAsignatura(asignatura_seleccionada);
         isForUpdate = true;
     }
@@ -611,7 +610,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
         ArrayDeque<Asignatura> asignaturas_temp = new ArrayDeque<>(asignaturas);
         asignatura_seleccionada = asignaturas_temp.getLast();
         loadDataAsignatura(asignatura_seleccionada);
-        spAsignaturas.setAdapter(new Spinner_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
+        spAsignaturas.setAdapter(new Asignaturas_General_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
         isForUpdate = true;
 
     }

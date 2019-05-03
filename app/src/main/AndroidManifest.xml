@@ -16,7 +16,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
         <activity
-            android:name=".Add_Edit_Grupos"
+            android:name=".views.personalizacion.Add_Edit_Grupos"
             android:label="@string/title_activity_add__edit__grupos"
             android:parentActivityName=".views.inicio.Inicio"
             android:theme="@style/AppTheme.NoActionBar">

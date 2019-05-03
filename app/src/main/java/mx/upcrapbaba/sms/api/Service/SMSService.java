@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 
 import java.util.List;
 
+import mx.upcrapbaba.sms.models.Alumno;
 import mx.upcrapbaba.sms.models.Asignatura;
 import mx.upcrapbaba.sms.models.Grupo;
 import mx.upcrapbaba.sms.models.User;
@@ -40,6 +41,13 @@ public interface SMSService {
     })
     @GET("/materias/")
     Call<List<Asignatura>> getAllAsignaturas(@Header("Authorization") String token);
+
+    @Headers({
+            "Content-Type: application/json",
+            "Accept: application/json "
+    })
+    @GET("/alumnos/")
+    Call<List<Alumno>> getAllAlumnos(@Header("Authorization") String token);
 
 
     /* Peticiones POST a sms-api-v1 */

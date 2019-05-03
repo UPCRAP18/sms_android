@@ -1,4 +1,4 @@
-package mx.upcrapbaba.sms.adaptadores;
+package mx.upcrapbaba.sms.adaptadores.spinners;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -20,27 +20,27 @@ import mx.upcrapbaba.sms.R;
 import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.models.Asignatura;
 
-public class Spinner_Adapter extends ArrayAdapter {
+public class Asignaturas_General_Adapter extends ArrayAdapter {
 
     private Context mContext;
-    private List<Asignatura> datSet;
+    private List<Asignatura> dataSet;
 
-    public Spinner_Adapter(@NonNull Context context, int resource, List<Asignatura> data) {
+    public Asignaturas_General_Adapter(@NonNull Context context, int resource, List<Asignatura> data) {
         super(context, resource);
         this.mContext = context;
-        this.datSet = data;
+        this.dataSet = data;
     }
 
     @Override
     public int getCount() {
-        return datSet.size();
+        return dataSet.size();
     }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         ViewHolder mViewHolder = new ViewHolder();
-        Asignatura asignatura_actual = datSet.get(position);
+        Asignatura asignatura_actual = dataSet.get(position);
         if (convertView == null) {
             LayoutInflater mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = mInflater.inflate(R.layout.asignatura_item, parent, false);
