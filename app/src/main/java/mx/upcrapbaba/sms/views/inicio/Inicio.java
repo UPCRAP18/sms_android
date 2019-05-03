@@ -347,6 +347,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
             user_photo.setOnClickListener(v -> {
                 startActivity(new Intent(Inicio.this, User_Profile.class));
                 overridePendingTransition(R.anim.left_in, R.anim.left_out);
+                Inicio.this.finish();
             });
 
 

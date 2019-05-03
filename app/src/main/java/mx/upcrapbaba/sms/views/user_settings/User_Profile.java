@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -25,6 +26,7 @@ import mx.upcrapbaba.sms.api.Service.SMSService;
 import mx.upcrapbaba.sms.extras.Alert_Dialog;
 import mx.upcrapbaba.sms.models.User;
 import mx.upcrapbaba.sms.sqlite.DBHelper;
+import mx.upcrapbaba.sms.views.sesion.Login;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -36,7 +38,6 @@ public class User_Profile extends AppCompatActivity {
     private ImageView imgEdit;
     private DBHelper helper;
     private EditText etNombre, etApellidos, etEmail, etMatricula;
-    private Button btnSave;
     private SMSService sms_service;
     private AVLoadingIndicatorView pbar;
     private User usuario;
@@ -59,7 +60,17 @@ public class User_Profile extends AppCompatActivity {
 
         setData_User();
 
-        btnSave = findViewById(R.id.btnGuardar);
+        Button btnSave = findViewById(R.id.btnGuardar);
+        Button btnLogout = findViewById(R.id.btnLogout);
+
+        btnLogout.setOnClickListener(v -> {
+            if(new DBHelper(User_Profile.this).dropUsr()){
+                startActivity(new Intent(User_Profile.this, Login.class));
+                User_Profile.this.finish();
+            }else {
+                Toasty.warning(User_Profile.this, "Ha ocurrido un error al cerrar sesion").show();
+            }
+        });
 
         imgEdit = findViewById(R.id.imgEdit);
         imgEditPhoto = findViewById(R.id.imgPhoto);

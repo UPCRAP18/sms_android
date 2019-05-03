@@ -1,5 +1,6 @@
 package mx.upcrapbaba.sms.views.personalizacion;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
@@ -13,6 +14,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.Gson;
@@ -74,7 +76,12 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
         if (getIntent().getExtras() != null) {
             SELECCIONADO = getIntent().getStringExtra("SELECCIONADO");
         } else {
-            //TODO Regresar al inicio
+            Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
+                    .positiveButton(R.string.aceptar, null, materialDialog -> {
+                        startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
+                        Add_Edit_Asignaturas.this.finish();
+                        return Unit.INSTANCE;
+                    }).show();
 
         }
 
@@ -135,13 +142,25 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
                 if (response.isSuccessful() && response.body() != null) {
                     lstAsignaturas.setAdapter(new Asignaturas_Adapter(Add_Edit_Asignaturas.this, response.body(), Add_Edit_Asignaturas.this));
                 } else {
-                    //TODO HANDLE
+                    Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
+                            .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
+                                Add_Edit_Asignaturas.this.finish();
+                                return Unit.INSTANCE;
+                            }).show();
+                    System.out.println("Error al obtener las asignaturas del servidor \n" + response.errorBody());
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call<List<Asignatura>> call, @NotNull Throwable t) {
-                //TODO HANDLE
+                Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
+                        .positiveButton(R.string.aceptar, null, materialDialog -> {
+                            startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
+                            Add_Edit_Asignaturas.this.finish();
+                            return Unit.INSTANCE;
+                        }).show();
+                System.out.println("Error en la request para obtener las asignaturas del servidor \n" + t.getMessage());
             }
         });
 
@@ -165,7 +184,6 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
 
                     btnSeleccionar_Asignatura.setOnClickListener(v -> {
                         if (spAsignaturas.getSelectedItemPosition() != (asignaturas.size() - 1)) {
-                            System.out.println("Indice de la asignatura seleccionada: " + spAsignaturas.getSelectedItemPosition());
                             isForUpdate = true;
                             loadDataAsignatura(asignaturas.get(spAsignaturas.getSelectedItemPosition()));
                         } else {
@@ -187,16 +205,25 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
                     });
 
                 } else {
-                    //TODO HANDLE
-                    System.out.println(response.errorBody());
-                    Toasty.warning(Add_Edit_Asignaturas.this, "Ha ocurrido un error").show();
+                    Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
+                            .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
+                                Add_Edit_Asignaturas.this.finish();
+                                return Unit.INSTANCE;
+                            }).show();
+                    System.out.println("Error al obtener la informacion de usuario del servidor \n" + response.errorBody());
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call<User> call, @NotNull Throwable t) {
-                //TODO HANDLE
-                System.out.println(t.toString());
+                Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
+                        .positiveButton(R.string.aceptar, null, materialDialog -> {
+                            startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
+                            Add_Edit_Asignaturas.this.finish();
+                            return Unit.INSTANCE;
+                        }).show();
+                System.out.println("Error en la request para obtener la informacion de usuario del servidor \n" + t.getMessage());
             }
         });
 
@@ -233,13 +260,29 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
 
                                 sms_service.update_data(data_Usuario, token, id_usuario).enqueue(new Callback<JsonObject>() {
                                     @Override
-                                    public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                                        //TODO HANDLE
+                                    public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+                                        if (response.isSuccessful() && response.body() != null){
+
+                                        }else {
+                                            Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
+                                                    .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                                        startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
+                                                        Add_Edit_Asignaturas.this.finish();
+                                                        return Unit.INSTANCE;
+                                                    }).show();
+                                            System.out.println("Error al obtener la informacion de usuario del servidor \n" + response.errorBody());
+                                        }
                                     }
 
                                     @Override
-                                    public void onFailure(Call<JsonObject> call, Throwable t) {
-                                        //TODO HANDLE
+                                    public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+                                        Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
+                                                .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                                    startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
+                                                    Add_Edit_Asignaturas.this.finish();
+                                                    return Unit.INSTANCE;
+                                                }).show();
+                                        System.out.println("Error al realizar la request para obtener la informacion de usuario del servidor \n" + t.getMessage());
                                     }
                                 });
 
@@ -269,7 +312,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
 
                     sms_service.add_asignatura(data_asignatura, token).enqueue(new Callback<JsonObject>() {
                         @Override
-                        public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                        public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
                             if (response.isSuccessful() && response.body() != null) {
 
                                 JsonObject update_data_usr = new JsonObject();
@@ -288,35 +331,57 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
 
                                 sms_service.update_data(update_data_usr, token, id_usuario).enqueue(new Callback<JsonObject>() {
                                     @Override
-                                    public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                                        if (response.isSuccessful()) {
+                                    public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+                                        if (response.isSuccessful() && response.body() != null) {
+                                            Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_correcto), getString(R.string.content_correcto))
+                                                    .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                                        Add_Edit_Asignaturas.this.recreate();
+                                                        return Unit.INSTANCE;
+                                                    }).show();
                                             Add_Edit_Asignaturas.this.recreate();
                                         } else {
-                                            //TODO HANDLE
-                                            System.out.println(response.errorBody());
-                                            Toasty.warning(Add_Edit_Asignaturas.this, "Ha ocurrido un error").show();
+                                            Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
+                                                    .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                                        startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
+                                                        Add_Edit_Asignaturas.this.finish();
+                                                        return Unit.INSTANCE;
+                                                    }).show();
+                                            System.out.println("Error al actualizar los datos de usuario (materias) \n" + response.errorBody());
                                         }
                                     }
 
                                     @Override
-                                    public void onFailure(Call<JsonObject> call, Throwable t) {
-                                        //TODO HANDLE
-                                        System.out.println(t.toString());
-                                        Toasty.warning(Add_Edit_Asignaturas.this, "Ha ocurrido un error en la request").show();
+                                    public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+                                        Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
+                                                .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                                    startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
+                                                    Add_Edit_Asignaturas.this.finish();
+                                                    return Unit.INSTANCE;
+                                                }).show();
+                                        System.out.println("Error en la request para actualizar los datos de usuario (materias) \n" + t.getMessage());
                                     }
                                 });
 
                             } else {
-                                //TODO HANDLE
-                                System.out.println(response.body().get("message"));
-                                Toasty.warning(Add_Edit_Asignaturas.this, "Ha ocurrido un error").show();
+                                Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
+                                        .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                            startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
+                                            Add_Edit_Asignaturas.this.finish();
+                                            return Unit.INSTANCE;
+                                        }).show();
+                                System.out.println("Error al añadir la nueva asignatura \n" + response.errorBody());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<JsonObject> call, Throwable t) {
-                            System.out.println(t.toString());
-                            Toasty.warning(Add_Edit_Asignaturas.this, "Ha ocurrido un error en la request").show();
+                            Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
+                                    .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                        startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
+                                        Add_Edit_Asignaturas.this.finish();
+                                        return Unit.INSTANCE;
+                                    }).show();
+                            System.out.println("Error en la request para añadir la nueva asignatura \n" + t.getMessage());
                         }
                     });
 
@@ -427,7 +492,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
      * @return True si es que ningun campo está vacio; False si alguno de los 2 esta vacio
      */
     private boolean validateFiedlsAsignaturas() {
-        return !etCod_Asig.getText().toString().isEmpty() || !etNombre_Asig.getText().toString().isEmpty();
+        return !etCod_Asig.getText().toString().isEmpty() && !etNombre_Asig.getText().toString().isEmpty();
     }
 
     /**
@@ -439,8 +504,6 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
      */
     @Override
     public void OnItemGroupSelected(Grupo grupo_seleccionado, String asignatura_grupo) {
-        //this.grupo_seleccionado = grupo_seleccionado;
-        //Toasty.success(Add_Edit_Asignaturas.this, "Se ha seleccionado el grupo " + grupo_seleccionado.getNombre_grupo()).show();
         grupos_to_add.add(grupo_seleccionado);
     }
 
@@ -453,13 +516,12 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
      */
     @Override
     public void OnItemGroupDeselected(Grupo grupo_seleccionado, String grupo_asignatura) {
-        //Toasty.success(Add_Edit_Asignaturas.this, "Se ha deseleccionado el grupo " + grupo_seleccionado.getNombre_grupo()).show();
         grupos_to_add.remove(grupo_seleccionado);
     }
 
     /**
-     * Item
-     * @param grupos_seleccionados
+     * Elimina los grupos seleccionado y actualiza la UI
+     * @param grupos_seleccionados --> Grupo que se ha seleccionado de manera general
      */
     private void DeleteGroup(List<Grupo> grupos_seleccionados) {
         StringBuilder grupos_string = new StringBuilder();
@@ -474,7 +536,6 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
             grupos_string.append(grupo.getNombre_grupo()).append(" ");
             for (int j = 0; j < grupos_temporal.size(); j++) {
                 if (grupos_temporal.get(j).getNombre_grupo().equals(grupo.getNombre_grupo())) {
-                    System.out.println("Se ha encontrado una coincidencia");
                     grupos_temporal.remove(j);
                 }
             }
@@ -497,6 +558,11 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
                 }).create().show();
     }
 
+
+    /**
+     *Elimina la asignatura seleccionada de manera general y actualiza la UI
+     * @param asignatura_seleccionada --> Asignatura seleccionada en el spinner
+     */
     private void DeleteAsignatura(Asignatura asignatura_seleccionada) {
 
         new AlertDialog.Builder(Add_Edit_Asignaturas.this)
@@ -516,9 +582,13 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
                 }).create().show();
     }
 
+    /**
+     * ItemListener para las asignaturas, añade la asignatura desde el servidor al arreglo
+     * para mas informacion ver {@link Asignaturas_Adapter}
+     * @param asignatura_seleccionado --> Asignatura seleccionada
+     */
     @Override
     public void OnAsignaturaSelected(Asignatura asignatura_seleccionado) {
-        //Toasty.info(Add_Edit_Asignaturas.this, "Se ha agregado a la lista").show();
         ArrayDeque<Asignatura> asignaturas_original_temp = new ArrayDeque<>(asignaturas);
         asignaturas_original_temp.removeLast();
         asignaturas.add(asignaturas_original_temp.size(), asignatura_seleccionado);
@@ -530,10 +600,12 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ad
         isForUpdate = true;
     }
 
+    /**
+     * Elimina del arreglo la asignatura de internet (Unicamente las que estn en el servidor)
+     * @param asignatura_seleccionado --> Asignatura deseleccionada em el listview
+     */
     @Override
     public void OnAsignaturaDeselected(Asignatura asignatura_seleccionado) {
-        Toasty.info(Add_Edit_Asignaturas.this, "Se ha eliminado de la lista").show();
-
         asignaturas.remove(asignatura_seleccionado);
         asignaturas_original.remove(asignatura_seleccionado);
         ArrayDeque<Asignatura> asignaturas_temp = new ArrayDeque<>(asignaturas);

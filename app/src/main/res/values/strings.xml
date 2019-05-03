@@ -57,6 +57,8 @@
     <string name="warning_del_grupo">¿Esta seguro de querer eliminar al grupo %s de la asignatura %s?</string>
     <string name="warning_del_asignatura">¿Esta seguro de querer eliminar la asignatura %s?</string>
     <string name="warn_update_asign">¿Esta seguro de querer actualizar los datos?</string>
+    <string name="header_correcto">¡Actualizacion correcta!</string>
+    <string name="content_correcto">Los datos se han actualizado de forma correcta</string>
 
     <!-- Notificacion de Red -->
     <string name="use_data">Usted está utilizando red de datos</string>
@@ -83,4 +85,5 @@
     <string name="lblGrupos_Asignatura">Grupos de la asignatura</string>
     <string name="lblGrupos_General">Añadir grupo/s</string>
     <string name="lblAsignaturas_Online">Asignaturas en la nube</string>
+    <string name="title_activity_add__edit__grupos">Add_Edit_Grupos</string>
 </resources>

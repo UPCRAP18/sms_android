@@ -271,6 +271,19 @@
             </LinearLayout>
 
             <Button
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/transparent"
+                android:padding="8dp"
+                android:text="@string/logout"
+                android:textAlignment="center"
+                android:textColor="@color/indigo_material"
+                android:textSize="14sp" />
+
+            <Button
                 android:id="@+id/btnChangePwd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
