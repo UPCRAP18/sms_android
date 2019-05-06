@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -67,6 +66,8 @@ public class User_Profile extends AppCompatActivity {
             if(new DBHelper(User_Profile.this).dropUsr()){
                 startActivity(new Intent(User_Profile.this, Login.class));
                 User_Profile.this.finish();
+                //TODO handle de donde viene
+                //Inicio.class.
             }else {
                 Toasty.warning(User_Profile.this, "Ha ocurrido un error al cerrar sesion").show();
             }

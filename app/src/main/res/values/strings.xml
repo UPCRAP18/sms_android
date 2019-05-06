@@ -95,6 +95,7 @@
     <string name="lblAlumnos_Nube">Alumnos en la nube</string>
     <string name="btnDelete_Grupo">Eliminar \n Grupo</string>
     <string name="btnDelete_Alumnos">Eliminar   alumno/s</string>
+    <string name="lblNo_alumnos">No se ha encontrado ningun alumno</string>
 
 
 </resources>

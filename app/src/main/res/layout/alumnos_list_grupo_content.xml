@@ -11,6 +11,6 @@
         android:fontFamily="@font/andika"
         android:text="@string/lblAlumnos"
         android:textColor="@color/colorAccent"
-        android:textSize="18sp" />
+        android:textSize="14sp" />
 
 </LinearLayout>

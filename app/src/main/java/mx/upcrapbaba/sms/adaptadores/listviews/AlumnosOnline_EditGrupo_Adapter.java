@@ -13,16 +13,16 @@ import java.util.List;
 import mx.upcrapbaba.sms.R;
 import mx.upcrapbaba.sms.models.Alumno;
 
-public class Alumnos_EditGrupo_Adapter implements ListAdapter {
+public class AlumnosOnline_EditGrupo_Adapter implements ListAdapter {
 
     private Context mContext;
     private List<Alumno> dataSet;
-    private Alumnos_EditGrupo_Adapter.AlumnoListener setOnAlumnoLocalListener;
+    private AlumnosOnline_EditGrupo_Adapter.AlumnoOnlineListener setOnAlumnoOnlineListener;
 
-    public Alumnos_EditGrupo_Adapter(Context mContext, List<Alumno> dataSet, AlumnoListener alumnoListener) {
+    public AlumnosOnline_EditGrupo_Adapter(Context mContext, List<Alumno> dataSet, AlumnoOnlineListener alumnoListener) {
         this.mContext = mContext;
         this.dataSet = dataSet;
-        this.setOnAlumnoLocalListener = alumnoListener;
+        this.setOnAlumnoOnlineListener = alumnoListener;
     }
 
     @Override
@@ -81,9 +81,9 @@ public class Alumnos_EditGrupo_Adapter implements ListAdapter {
 
             cboAlumno.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
-                    setOnAlumnoLocalListener.OnAlumnoSelected(alumno_actual);
+                    setOnAlumnoOnlineListener.OnAlumnoOnlineSelected(alumno_actual);
                 } else {
-                    setOnAlumnoLocalListener.OnAlumnoDeselected(alumno_actual);
+                    setOnAlumnoOnlineListener.OnAlumnoOnlineDeselected(alumno_actual);
                 }
             });
 
@@ -107,10 +107,10 @@ public class Alumnos_EditGrupo_Adapter implements ListAdapter {
         return false;
     }
 
-    public interface AlumnoListener {
-        void OnAlumnoSelected(Alumno alumno_seleccionado);
+    public interface AlumnoOnlineListener {
+        void OnAlumnoOnlineSelected(Alumno alumno_seleccionado);
 
-        void OnAlumnoDeselected(Alumno alumno_seleccionado);
+        void OnAlumnoOnlineDeselected(Alumno alumno_seleccionado);
     }
 
 

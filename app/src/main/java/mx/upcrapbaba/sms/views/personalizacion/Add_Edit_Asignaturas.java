@@ -58,7 +58,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
     private int REQUEST_GET_SINGLE_FILE = 1;
     private boolean isForUpdate = false, isDeletedAsign = false;
     private ListView lstGrupos, lstAsignaturas;
-    private Asignatura asignatura_seleccionada;
+    private Asignatura asignatura_seleccionada, asignatura_temporal;
     private TextView txtTipo_Grupo;
     private SMSService sms_service;
 
@@ -102,7 +102,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
         imgAsignatura = findViewById(R.id.imgAsig_Edit);
         spAsignaturas = findViewById(R.id.spAsignaturas_Edit);
         lstGrupos = findViewById(R.id.lstGrupos);
-        txtTipo_Grupo = findViewById(R.id.txtTipo_Grupos);
+        txtTipo_Grupo = findViewById(R.id.txtTipo_Alumno);
         lstAsignaturas = findViewById(R.id.lstAsignaturas_Online);
 
         Button btnSave = findViewById(R.id.btnGuardar);
@@ -233,13 +233,26 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
                     String nombre_mat = etNombre_Asig.getText().toString();
 
                     if (asignatura_seleccionada.getNombre_materia().equals("Agregar nueva asignatura")) {
-                        System.out.println("No hay ninguna asignatura que actualizar, actaulizando los valores en el arreglo");
+                        System.out.println("No hay ninguna asignatura que actualizar, actualizando los valores en el arreglo");
                     } else {
                         //Actualizo los valores del seleccionado, elimino el original y subo el nuevo, respetando los indices
                         int index = asignaturas_original.indexOf(asignatura_seleccionada);
-                        asignaturas_original.remove(asignatura_seleccionada);
+                        if (index < 0) {
+                            index++;
+                        } else if (index >= asignaturas_original.size()) {
+                            index--;
+                        }
+                        asignaturas.remove(index);
+                        asignaturas_original.remove(index);
                         asignatura_seleccionada.setCodigo_materia(codigo_mat);
                         asignatura_seleccionada.setNombre_materia(nombre_mat);
+                        JsonArray grupos_asignatura = asignatura_seleccionada.getGrupos();
+                        JsonArray grupos = (JsonArray) new Gson().toJsonTree(grupos_to_add, new TypeToken<List<Grupo>>() {
+                        }.getType());
+                        if (grupos.size() != 0) {
+                            grupos_asignatura.add(grupos.get(0));
+                        }
+                        asignatura_seleccionada.setGrupos(grupos_asignatura);
                         asignaturas_original.add(index, asignatura_seleccionada);
                     }
 
@@ -261,7 +274,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
                                     @Override
                                     public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
                                         if (response.isSuccessful() && response.body() != null){
-
+                                            Add_Edit_Asignaturas.this.recreate();
                                         }else {
                                             Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
                                                     .positiveButton(R.string.aceptar, null, materialDialog -> {
@@ -457,7 +470,9 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
         txtTipo_Grupo.setText(getResources().getString(R.string.lblGrupos_Asignatura));
         asignatura_seleccionada = asignatura;
         etCod_Asig.setText(asignatura_seleccionada.getCodigo_materia());
-        etNombre_Asig.setText(asignatura_seleccionada.getNombre_materia());
+        if (asignatura_seleccionada.getCodigo_materia() != null) {
+            etNombre_Asig.setText(asignatura_seleccionada.getNombre_materia());
+        }
         nombre_asignatura_grupo.clear();
         if (asignatura_seleccionada.getImagen_materia() != null) {
             String url = new ApiWeb().getBASE_URL_GLITCH() + "/" + asignatura_seleccionada.getImagen_materia();
@@ -527,14 +542,14 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
         List<Grupo> grupos_temporal = new Gson().fromJson(asignatura_seleccionada.getGrupos(), new TypeToken<List<Grupo>>() {
         }.getType());
 
-        int index = asignaturas.indexOf(asignatura_seleccionada);
+        int index = spAsignaturas.getSelectedItemPosition();
         asignaturas_original.remove(index);
 
         for (int i = 0; i < grupos_seleccionados.size(); i++) {
             Grupo grupo = grupos_seleccionados.get(i);
             grupos_string.append(grupo.getNombre_grupo()).append(" ");
             for (int j = 0; j < grupos_temporal.size(); j++) {
-                if (grupos_temporal.get(j).getNombre_grupo().equals(grupo.getNombre_grupo())) {
+                if (grupos_temporal.get(j).getNombre_grupo() == null || grupos_temporal.get(j).getNombre_grupo().equals(grupo.getNombre_grupo())) {
                     grupos_temporal.remove(j);
                 }
             }
@@ -554,6 +569,8 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
 
                     loadDataAsignatura(asignatura_seleccionada);
 
+                    grupos_seleccionados.clear();
+
                 }).create().show();
     }
 
@@ -570,11 +587,17 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
                 .setNegativeButton(getResources().getString(R.string.cancelar), (dialog, which) -> dialog.dismiss())
                 .setPositiveButton(getResources().getString(R.string.btnEliminar_Asignatura), (dialog, which) -> {
                     asignaturas.remove(asignatura_seleccionada);
-                    ArrayDeque<Asignatura> asignaturas_original_temp = new ArrayDeque<>(asignaturas);
-                    Add_Edit_Asignaturas.this.asignatura_seleccionada = asignaturas_original_temp.getLast();
-                    asignaturas_original_temp.removeLast();
+                    ArrayDeque<Asignatura> asignaturas_temp = new ArrayDeque<>(asignaturas);
+                    asignaturas_temp.removeLast();
+                    if (!asignaturas_temp.isEmpty()) {
+                        Add_Edit_Asignaturas.this.asignatura_seleccionada = asignaturas_temp.getLast();
+                        //asignaturas_temp.removeLast();
+                    } else {
+                        Add_Edit_Asignaturas.this.asignatura_seleccionada = asignaturas.get(asignaturas.size() - 1);
+
+                    }
                     asignaturas_original.clear();
-                    asignaturas_original.addAll(asignaturas_original_temp);
+                    asignaturas_original.addAll(asignaturas_temp);
                     spAsignaturas.setAdapter(new Asignaturas_General_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
                     loadDataAsignatura(Add_Edit_Asignaturas.this.asignatura_seleccionada);
                     isForUpdate = true;
@@ -592,7 +615,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
         asignaturas_original_temp.removeLast();
         asignaturas.add(asignaturas_original_temp.size(), asignatura_seleccionado);
         asignaturas_original.add(asignatura_seleccionado);
-        ArrayDeque<Asignatura> asignaturas_temp = new ArrayDeque<>(asignaturas);
+        ArrayDeque<Asignatura> asignaturas_temp = new ArrayDeque<>(asignaturas_original);
         asignatura_seleccionada = asignaturas_temp.getLast();
         spAsignaturas.setAdapter(new Asignaturas_General_Adapter(Add_Edit_Asignaturas.this, R.layout.asignatura_item, asignaturas));
         loadDataAsignatura(asignatura_seleccionada);

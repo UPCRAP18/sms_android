@@ -18,15 +18,19 @@ import com.google.gson.reflect.TypeToken;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 import kotlin.Unit;
 import mx.upcrapbaba.sms.R;
+import mx.upcrapbaba.sms.adaptadores.listviews.AlumnosOnline_EditGrupo_Adapter;
+import mx.upcrapbaba.sms.adaptadores.listviews.Alumnos_EditGrupo_Adapter;
 import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.api.Service.SMSService;
 import mx.upcrapbaba.sms.extras.Alert_Dialog;
+import mx.upcrapbaba.sms.models.Alumno;
 import mx.upcrapbaba.sms.models.Asignatura;
 import mx.upcrapbaba.sms.models.Grupo;
 import mx.upcrapbaba.sms.models.User;
@@ -35,7 +39,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Add_Edit_Grupos extends AppCompatActivity {
+public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGrupo_Adapter.AlumnoListener, AlumnosOnline_EditGrupo_Adapter.AlumnoOnlineListener {
 
     private SMSService sms_service;
     private String SELECCIONADO = "", token = "";
@@ -43,6 +47,8 @@ public class Add_Edit_Grupos extends AppCompatActivity {
     private List<Asignatura> asignaturas_original = new LinkedList<>();
     private ArrayDeque<Asignatura> asignaturas_temporal = new ArrayDeque<>();
     private List<Grupo> grupos_original = new LinkedList<>();
+    private List<Alumno> alumnos_grupo = new LinkedList<>();
+    private ArrayDeque<Alumno> alumnos_temporal = new ArrayDeque<>();
     private ArrayDeque<Grupo> grupos_edited = new ArrayDeque<>();
     private ArrayDeque<String> grupos_for_spinner = new ArrayDeque<>();
     private EditText etNombre_Grupo;
@@ -91,6 +97,9 @@ public class Add_Edit_Grupos extends AppCompatActivity {
         btnEliminar_Alumnos = findViewById(R.id.btnEliminar_Alummnos);
         btnEliminar_Grupo = findViewById(R.id.btnEliminar_Grupo);
         btnSeleccionar_Grupo = findViewById(R.id.btnSelect_Grupo_Edit);
+        lstAlumnos_Inscritos = findViewById(R.id.lstAlumnos_Inscritos);
+        lstAlumnos_Online = findViewById(R.id.lstAlumnos_Online);
+        btnEdit_Criterios = findViewById(R.id.btnEditar_Criterios);
 
         sms_service.getUserInfo(token, id_usuario).enqueue(new Callback<User>() {
             @Override
@@ -123,8 +132,13 @@ public class Add_Edit_Grupos extends AppCompatActivity {
 
                     btnSeleccionar_Grupo.setOnClickListener(v -> {
                         if (spGrupos.getSelectedItemPosition() < grupos_original.size()) {
+                            btnEliminar_Grupo.setEnabled(true);
+                            btnEdit_Criterios.setEnabled(true);
+                            grupo_seleccionado = (Grupo) spGrupos.getSelectedItem();
                             loadDataSpinner(grupos_original.get(spGrupos.getSelectedItemPosition()));
                         } else {
+                            btnEliminar_Grupo.setEnabled(false);
+                            btnEdit_Criterios.setEnabled(false);
                             //TODO Handle --> Crear nuevo grupo
                         }
                     });
@@ -152,18 +166,67 @@ public class Add_Edit_Grupos extends AppCompatActivity {
             }
         });
 
+        sms_service.getAllAlumnos(token).enqueue(new Callback<List<Alumno>>() {
+            @Override
+            public void onResponse(@NotNull Call<List<Alumno>> call, @NotNull Response<List<Alumno>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    lstAlumnos_Online.setAdapter(new AlumnosOnline_EditGrupo_Adapter(Add_Edit_Grupos.this, response.body(), Add_Edit_Grupos.this));
+                } else {
+                    Alert_Dialog.showWarnMessage(Add_Edit_Grupos.this, getString(R.string.header_warning), getString(R.string.request_error))
+                            .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                startActivity(new Intent(Add_Edit_Grupos.this, Add_Edit_Grupos.class));
+                                Add_Edit_Grupos.this.finish();
+                                return Unit.INSTANCE;
+                            }).show();
+                    System.out.println("Error al obtener los alumnos del servidor \n" + response.errorBody());
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<List<Alumno>> call, @NotNull Throwable t) {
+                Alert_Dialog.showWarnMessage(Add_Edit_Grupos.this, getString(R.string.header_warning), getString(R.string.request_error))
+                        .positiveButton(R.string.aceptar, null, materialDialog -> {
+                            startActivity(new Intent(Add_Edit_Grupos.this, Add_Edit_Grupos.class));
+                            Add_Edit_Grupos.this.finish();
+                            return Unit.INSTANCE;
+                        }).show();
+                System.out.println("Error en la request para obtener los alumnos del servidor \n" + t.getMessage());
+            }
+        });
+
     }
 
     private void loadDataSpinner(Grupo grupo_seleccionado) {
-        Toasty.info(Add_Edit_Grupos.this, grupo_seleccionado.getNombre_grupo()).show();
+        etNombre_Grupo.setText(grupo_seleccionado.getNombre_grupo());
+        alumnos_grupo = new Gson().fromJson(grupo_seleccionado.getAlumnos(), new TypeToken<List<Alumno>>() {
+        }.getType());
+        alumnos_temporal.addAll(alumnos_grupo);
+        if (!alumnos_grupo.isEmpty()) {
+            lstAlumnos_Inscritos.setAdapter(new Alumnos_EditGrupo_Adapter(Add_Edit_Grupos.this, alumnos_grupo, Add_Edit_Grupos.this));
+        } else {
+            lstAlumnos_Inscritos.setAdapter(new ArrayAdapter<>(Add_Edit_Grupos.this, android.R.layout.simple_list_item_1, new ArrayList<>()));
+        }
+
+
     }
 
-    private void loadDatalstAlumnos_Inscritos() {
-
+    @Override
+    public void OnAlumnoSelected(Alumno alumno_seleccionado) {
+        Toasty.info(Add_Edit_Grupos.this, "Alumno local seleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
     }
 
-    private void loadDatalstAlumnos_Online() {
-
+    @Override
+    public void OnAlumnoDeselected(Alumno alumno_seleccionado) {
+        Toasty.info(Add_Edit_Grupos.this, "Alumno local deseleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
     }
 
+    @Override
+    public void OnAlumnoOnlineSelected(Alumno alumno_seleccionado) {
+        Toasty.info(Add_Edit_Grupos.this, "Alumno online seleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
+    }
+
+    @Override
+    public void OnAlumnoOnlineDeselected(Alumno alumno_seleccionado) {
+        Toasty.info(Add_Edit_Grupos.this, "Alumno online deseleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
+    }
 }
