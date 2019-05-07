@@ -3,16 +3,21 @@ package mx.upcrapbaba.sms.views.personalizacion;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +32,7 @@ import kotlin.Unit;
 import mx.upcrapbaba.sms.R;
 import mx.upcrapbaba.sms.adaptadores.listviews.AlumnosOnline_EditGrupo_Adapter;
 import mx.upcrapbaba.sms.adaptadores.listviews.Alumnos_EditGrupo_Adapter;
+import mx.upcrapbaba.sms.adaptadores.spinners.Asignaturas_General_Adapter;
 import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.api.Service.SMSService;
 import mx.upcrapbaba.sms.extras.Alert_Dialog;
@@ -41,21 +47,25 @@ import retrofit2.Response;
 
 public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGrupo_Adapter.AlumnoListener, AlumnosOnline_EditGrupo_Adapter.AlumnoOnlineListener {
 
-    private SMSService sms_service;
-    private String SELECCIONADO = "", token = "";
+    private String SELECCIONADO = "", token = "", id_usuario = "";
     private User user_data;
     private List<Asignatura> asignaturas_original = new LinkedList<>();
     private ArrayDeque<Asignatura> asignaturas_temporal = new ArrayDeque<>();
     private List<Grupo> grupos_original = new LinkedList<>();
-    private List<Alumno> alumnos_grupo = new LinkedList<>();
+    private List<Alumno> alumnos_grupo = new LinkedList<>(), alumnos_to_remove = new LinkedList<>();
     private ArrayDeque<Alumno> alumnos_temporal = new ArrayDeque<>();
     private ArrayDeque<Grupo> grupos_edited = new ArrayDeque<>();
     private ArrayDeque<String> grupos_for_spinner = new ArrayDeque<>();
     private EditText etNombre_Grupo;
-    private Spinner spGrupos;
-    private Button btnSave, btnEliminar_Grupo, btnEliminar_Alumnos, btnEdit_Criterios, btnSeleccionar_Grupo;
+    private Spinner spGrupos, spAsignaturas;
+    private Button btnSave, btnEliminar_Alumnos, btnEdit_Criterios, btnSeleccionar_Grupo, btnClosePopup;
     private ListView lstAlumnos_Inscritos, lstAlumnos_Online;
     private Grupo grupo_seleccionado = null;
+    private List<Alumno> alumnos_to_add = new LinkedList<>();
+    private TextView txtAsignaturas;
+    private Asignatura asignatura_seleccionada;
+    private SMSService sms_service;
+    private View popUpView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,14 +74,14 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
 
         sms_service = ApiWeb.getApi(new ApiWeb().getBASE_URL_GLITCH()).create(SMSService.class);
         token = "Bearer " + new DBHelper(this).getData_Usuario().get(1);
-        String id_usuario = new DBHelper(this).getData_Usuario().get(0);
+        id_usuario = new DBHelper(this).getData_Usuario().get(0);
 
         if (getIntent().getExtras() != null) {
             SELECCIONADO = getIntent().getStringExtra("SELECCIONADO");
         } else {
             Alert_Dialog.showWarnMessage(Add_Edit_Grupos.this, getString(R.string.header_warning), getString(R.string.request_error))
                     .positiveButton(R.string.aceptar, null, materialDialog -> {
-                        startActivity(new Intent(Add_Edit_Grupos.this, Add_Edit_Asignaturas.class));
+                        startActivity(new Intent(Add_Edit_Grupos.this, Add_Edit_Grupos.class));
                         Add_Edit_Grupos.this.finish();
                         return Unit.INSTANCE;
                     }).show();
@@ -94,12 +104,14 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
         etNombre_Grupo = findViewById(R.id.etGrupo_Nombre);
         spGrupos = findViewById(R.id.spGrupos_Edit);
         btnSave = findViewById(R.id.btnGuardar);
-        btnEliminar_Alumnos = findViewById(R.id.btnEliminar_Alummnos);
-        btnEliminar_Grupo = findViewById(R.id.btnEliminar_Grupo);
+        btnEliminar_Alumnos = findViewById(R.id.btnEliminar_Alumnos);
         btnSeleccionar_Grupo = findViewById(R.id.btnSelect_Grupo_Edit);
         lstAlumnos_Inscritos = findViewById(R.id.lstAlumnos_Inscritos);
         lstAlumnos_Online = findViewById(R.id.lstAlumnos_Online);
         btnEdit_Criterios = findViewById(R.id.btnEditar_Criterios);
+        spAsignaturas = findViewById(R.id.spAsignatura_to_select);
+        txtAsignaturas = findViewById(R.id.txtAsignatura_Label);
+        popUpView = findViewById(R.id.popUpView);
 
         sms_service.getUserInfo(token, id_usuario).enqueue(new Callback<User>() {
             @Override
@@ -132,14 +144,34 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
 
                     btnSeleccionar_Grupo.setOnClickListener(v -> {
                         if (spGrupos.getSelectedItemPosition() < grupos_original.size()) {
-                            btnEliminar_Grupo.setEnabled(true);
+                            txtAsignaturas.setVisibility(View.GONE);
+                            spAsignaturas.setVisibility(View.GONE);
                             btnEdit_Criterios.setEnabled(true);
-                            grupo_seleccionado = (Grupo) spGrupos.getSelectedItem();
-                            loadDataSpinner(grupos_original.get(spGrupos.getSelectedItemPosition()));
+                            btnEliminar_Alumnos.setEnabled(true);
+                            editCriterios();
+                            grupo_seleccionado = grupos_original.get(spGrupos.getSelectedItemPosition());
+                            loadDataSpinner(grupo_seleccionado);
                         } else {
-                            btnEliminar_Grupo.setEnabled(false);
+                            btnEliminar_Alumnos.setEnabled(false);
                             btnEdit_Criterios.setEnabled(false);
-                            //TODO Handle --> Crear nuevo grupo
+                            etNombre_Grupo.getText().clear();
+                            txtAsignaturas.setVisibility(View.VISIBLE);
+                            spAsignaturas.setVisibility(View.VISIBLE);
+                            spAsignaturas.setAdapter(new Asignaturas_General_Adapter(Add_Edit_Grupos.this, R.layout.asignatura_item, asignaturas_original));
+                            grupo_seleccionado = null;
+                            asignatura_seleccionada = asignaturas_original.get(spAsignaturas.getSelectedItemPosition());
+                            spAsignaturas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                    asignatura_seleccionada = asignaturas_original.get(position);
+                                    System.out.println(asignatura_seleccionada.getNombre_materia());
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> parent) {
+
+                                }
+                            });
                         }
                     });
 
@@ -194,6 +226,42 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
             }
         });
 
+        btnSave.setOnClickListener(v -> {
+            if (grupo_seleccionado != null) {
+                actualizar_grupo();
+            } else {
+                add_new_grupo();
+            }
+
+        });
+
+        btnEliminar_Alumnos.setOnClickListener(v -> DeleteAlumnos());
+
+    }
+
+    private void actualizar_grupo() {
+
+    }
+
+    private void DeleteAlumnos() {
+        Alert_Dialog.showWarnMessage(Add_Edit_Grupos.this, "¡Advertencia!", "¿Esta seguro de querer eliminar a los alumnos seleccionados?")
+                .negativeButton(R.string.cancelar, null, materialDialog -> Unit.INSTANCE)
+                .positiveButton(R.string.aceptar, null, materialDialog -> {
+                    alumnos_grupo.removeAll(alumnos_to_remove);
+                    if (!alumnos_grupo.isEmpty()) {
+                        lstAlumnos_Inscritos.setAdapter(new Alumnos_EditGrupo_Adapter(Add_Edit_Grupos.this, alumnos_grupo, Add_Edit_Grupos.this));
+                    } else {
+                        lstAlumnos_Inscritos.setAdapter(new ArrayAdapter<>(Add_Edit_Grupos.this, android.R.layout.simple_list_item_1, new ArrayList<>()));
+                    }
+                    return Unit.INSTANCE;
+                }).show();
+    }
+
+    private void editCriterios() {
+        btnClosePopup = popUpView.findViewById(R.id.btnClose);
+
+        btnEdit_Criterios.setOnClickListener(v -> popUpView.setVisibility(View.VISIBLE));
+        btnClosePopup.setOnClickListener(v -> popUpView.setVisibility(View.GONE));
     }
 
     private void loadDataSpinner(Grupo grupo_seleccionado) {
@@ -210,23 +278,104 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
 
     }
 
+    private void add_new_grupo() {
+        if (!etNombre_Grupo.getText().toString().isEmpty()) {
+            asignaturas_temporal.remove(asignatura_seleccionada);
+            Grupo grupo_nuevo = new Grupo();
+            JsonArray alumnos_add = (JsonArray) new Gson().toJsonTree(alumnos_to_add, new TypeToken<List<Alumno>>() {
+            }.getType());
+            grupo_nuevo.setNombre_grupo(etNombre_Grupo.getText().toString());
+
+            JsonObject grupo = new JsonObject();
+            grupo.addProperty("nombre_grupo", etNombre_Grupo.getText().toString());
+
+            sms_service.add_grupo(grupo, token).enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        JsonObject user = new JsonObject();
+                        grupo_nuevo.setAlumnos(alumnos_add);
+
+                        JsonArray grupos_asignatura = asignatura_seleccionada.getGrupos();
+
+                        grupos_asignatura.add(new Gson().toJsonTree(grupo_nuevo, new TypeToken<Grupo>() {
+                        }.getType()));
+
+                        asignatura_seleccionada.setGrupos(grupos_asignatura);
+
+                        asignaturas_temporal.add(asignatura_seleccionada);
+
+                        asignaturas_original.clear();
+
+                        asignaturas_original.addAll(asignaturas_temporal);
+
+                        JsonArray asignaturas_new = (JsonArray) new Gson().toJsonTree(asignaturas_original, new TypeToken<List<Asignatura>>() {
+                        }.getType());
+
+                        user.add("materias", asignaturas_new);
+
+                        sms_service.update_data(user, token, id_usuario).enqueue(new Callback<JsonObject>() {
+                            @Override
+                            public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+                                if (response.isSuccessful() && response.body() != null) {
+                                    Alert_Dialog.showWarnMessage(Add_Edit_Grupos.this, "¡Correcto!", "Se ha creado el grupo")
+                                            .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                                Add_Edit_Grupos.this.recreate();
+                                                return Unit.INSTANCE;
+                                            }).show();
+                                } else {
+                                    Toasty.info(Add_Edit_Grupos.this, "Ha ocurrido un error al añadir el grupo").show();
+                                    System.out.println(response.errorBody());
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+                                Toasty.info(Add_Edit_Grupos.this, "Ha ocurrido un error en la request").show();
+                                System.out.println(t.getMessage());
+                            }
+                        });
+                    } else {
+                        Toasty.info(Add_Edit_Grupos.this, "Ha ocurrido un error al añadir el grupo").show();
+                        System.out.println(response.errorBody());
+                    }
+                }
+
+                @Override
+                public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+                    Toasty.info(Add_Edit_Grupos.this, "Ha ocurrido un error en la request").show();
+                    System.out.println(t.getMessage());
+                }
+            });
+
+        } else {
+            Toasty.warning(Add_Edit_Grupos.this, getString(R.string.warn_nombre_grupo)).show();
+        }
+    }
+
     @Override
     public void OnAlumnoSelected(Alumno alumno_seleccionado) {
-        Toasty.info(Add_Edit_Grupos.this, "Alumno local seleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
+        //Toasty.info(Add_Edit_Grupos.this, "Alumno local seleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
+        alumnos_to_remove.add(alumno_seleccionado);
     }
 
     @Override
     public void OnAlumnoDeselected(Alumno alumno_seleccionado) {
-        Toasty.info(Add_Edit_Grupos.this, "Alumno local deseleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
+        //Toasty.info(Add_Edit_Grupos.this, "Alumno local deseleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
+        alumnos_to_remove.remove(alumno_seleccionado);
     }
 
     @Override
     public void OnAlumnoOnlineSelected(Alumno alumno_seleccionado) {
-        Toasty.info(Add_Edit_Grupos.this, "Alumno online seleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
+        //Toasty.info(Add_Edit_Grupos.this, "Alumno online seleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
+        alumnos_to_add.add(alumno_seleccionado);
     }
 
     @Override
     public void OnAlumnoOnlineDeselected(Alumno alumno_seleccionado) {
-        Toasty.info(Add_Edit_Grupos.this, "Alumno online deseleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
+        //Toasty.info(Add_Edit_Grupos.this, "Alumno online deseleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
+        alumnos_to_add.remove(alumno_seleccionado);
     }
+
+
 }
