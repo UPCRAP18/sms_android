@@ -49,19 +49,16 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
 
     private String SELECCIONADO = "", token = "", id_usuario = "";
     private User user_data;
-    private List<Asignatura> asignaturas_original = new LinkedList<>();
+    private List<Asignatura> asignaturas_original = new LinkedList<>(), asignaturas_repeated = new LinkedList<>();
     private ArrayDeque<Asignatura> asignaturas_temporal = new ArrayDeque<>();
     private List<Grupo> grupos_original = new LinkedList<>();
-    private List<Alumno> alumnos_grupo = new LinkedList<>(), alumnos_to_remove = new LinkedList<>();
-    private ArrayDeque<Alumno> alumnos_temporal = new ArrayDeque<>();
-    private ArrayDeque<Grupo> grupos_edited = new ArrayDeque<>();
+    private List<Alumno> alumnos_grupo = new LinkedList<>(), alumnos_to_remove = new LinkedList<>(), alumnos_to_add = new LinkedList<>();
     private ArrayDeque<String> grupos_for_spinner = new ArrayDeque<>();
     private EditText etNombre_Grupo;
     private Spinner spGrupos, spAsignaturas;
-    private Button btnSave, btnEliminar_Alumnos, btnEdit_Criterios, btnSeleccionar_Grupo, btnClosePopup;
+    private Button btnEliminar_Alumnos, btnEdit_Criterios, btnSeleccionar_Grupo, btnClosePopup;
     private ListView lstAlumnos_Inscritos, lstAlumnos_Online;
     private Grupo grupo_seleccionado = null;
-    private List<Alumno> alumnos_to_add = new LinkedList<>();
     private TextView txtAsignaturas;
     private Asignatura asignatura_seleccionada;
     private SMSService sms_service;
@@ -103,7 +100,7 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
 
         etNombre_Grupo = findViewById(R.id.etGrupo_Nombre);
         spGrupos = findViewById(R.id.spGrupos_Edit);
-        btnSave = findViewById(R.id.btnGuardar);
+        Button btnSave = findViewById(R.id.btnGuardar);
         btnEliminar_Alumnos = findViewById(R.id.btnEliminar_Alumnos);
         btnSeleccionar_Grupo = findViewById(R.id.btnSelect_Grupo_Edit);
         lstAlumnos_Inscritos = findViewById(R.id.lstAlumnos_Inscritos);
@@ -133,10 +130,9 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
                         for (int j = 0; j < grupo_asignatura.size(); j++) {
                             grupos_original.add(grupo_asignatura.get(j));
                             grupos_for_spinner.add(String.format("%s - %s", grupo_asignatura.get(j).getNombre_grupo(), asignaturas_original.get(i).getNombre_materia()));
+                            asignaturas_repeated.add(asignaturas_original.get(i));
                         }
                     }
-
-                    grupos_edited.addAll(grupos_original);
 
                     grupos_for_spinner.add("Crear grupo");
 
@@ -240,7 +236,26 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
     }
 
     private void actualizar_grupo() {
+        int index = spGrupos.getSelectedItemPosition() - 1;
+        if (index < 0) {
+            index++;
+        } else if (index > asignaturas_repeated.size()) {
+            index--;
+        }
+        asignatura_seleccionada = asignaturas_repeated.get(index);
 
+        //System.out.println("Se va a actualizar el grupo: " + grupo_seleccionado.getNombre_grupo() + " en la materia: " + asignatura_seleccionada.getNombre_materia() );
+        if (!etNombre_Grupo.getText().toString().isEmpty()) {
+            grupos_original.remove(grupo_seleccionado);
+            grupo_seleccionado.setNombre_grupo(etNombre_Grupo.getText().toString());
+            grupo_seleccionado.setAlumnos((JsonArray) new Gson().toJsonTree(alumnos_grupo, new TypeToken<List<Alumno>>() {
+            }.getType()));
+
+            //TODO no te hagas wey Rodrigo, solo falta 1) Agregar los datos al grupo seleccionado, actualizar la lista de grupos y actualizar la informacion del perfil
+
+        } else {
+            //TODO HANDLE
+        }
     }
 
     private void DeleteAlumnos() {
@@ -268,7 +283,6 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
         etNombre_Grupo.setText(grupo_seleccionado.getNombre_grupo());
         alumnos_grupo = new Gson().fromJson(grupo_seleccionado.getAlumnos(), new TypeToken<List<Alumno>>() {
         }.getType());
-        alumnos_temporal.addAll(alumnos_grupo);
         if (!alumnos_grupo.isEmpty()) {
             lstAlumnos_Inscritos.setAdapter(new Alumnos_EditGrupo_Adapter(Add_Edit_Grupos.this, alumnos_grupo, Add_Edit_Grupos.this));
         } else {
