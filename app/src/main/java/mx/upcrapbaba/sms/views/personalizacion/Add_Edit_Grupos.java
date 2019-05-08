@@ -251,10 +251,46 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
             grupo_seleccionado.setAlumnos((JsonArray) new Gson().toJsonTree(alumnos_grupo, new TypeToken<List<Alumno>>() {
             }.getType()));
 
+            grupos_original.add(grupo_seleccionado);
             //TODO no te hagas wey Rodrigo, solo falta 1) Agregar los datos al grupo seleccionado, actualizar la lista de grupos y actualizar la informacion del perfil
+            asignaturas_original.remove(asignatura_seleccionada);
+            asignatura_seleccionada.setGrupos((JsonArray) new Gson().toJsonTree(grupos_original, new TypeToken<List<Grupo>>() {
+            }.getType()));
+
+            asignaturas_original.add(asignatura_seleccionada);
+
+            JsonObject user_update = new JsonObject();
+
+            JsonArray asignaturas_new = (JsonArray) new Gson().toJsonTree(asignaturas_original, new TypeToken<List<Asignatura>>() {
+            }.getType());
+
+            user_update.add("materias", asignaturas_new);
+
+            sms_service.update_data(user_update, token, id_usuario).enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        Alert_Dialog.showWarnMessage(Add_Edit_Grupos.this, "¡Actualizacion correcta", "Se ha actualizado correctamente la informacion de usuario")
+                                .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                    Add_Edit_Grupos.this.recreate();
+                                    return Unit.INSTANCE;
+                                }).show();
+                    } else {
+                        Toasty.error(Add_Edit_Grupos.this, "Ha ocurrido un error en la request").show();
+                        System.out.println("Error al actualizar los valores " + response.errorBody());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Toasty.error(Add_Edit_Grupos.this, "Ha ocurrido un error en la request").show();
+                    System.out.println("Error en la request " + t.getMessage());
+                }
+            });
+
 
         } else {
-            //TODO HANDLE
+            Toasty.warning(Add_Edit_Grupos.this, getString(R.string.fields_error)).show();
         }
     }
 

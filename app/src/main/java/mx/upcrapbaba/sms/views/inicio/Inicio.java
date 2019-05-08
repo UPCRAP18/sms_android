@@ -178,9 +178,9 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
      */
     @Override
     public void onMenuItemReselect(int i, int i1, boolean b) {
-        startActivity(new Intent(this, Inicio.class));
+        startActivity(new Intent(Inicio.this, Inicio.class));
         overridePendingTransition(0, 0);
-        this.finish();
+        Inicio.this.finish();
     }
 
     /**
