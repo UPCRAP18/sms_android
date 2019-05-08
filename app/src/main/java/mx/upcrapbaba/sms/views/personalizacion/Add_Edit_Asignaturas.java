@@ -102,7 +102,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
         imgAsignatura = findViewById(R.id.imgAsig_Edit);
         spAsignaturas = findViewById(R.id.spAsignaturas_Edit);
         lstGrupos = findViewById(R.id.lstGrupos);
-        txtTipo_Grupo = findViewById(R.id.txtTipo_Alumno);
+        txtTipo_Grupo = findViewById(R.id.txtGrupos_Inscrito);
         lstAsignaturas = findViewById(R.id.lstAsignaturas_Online);
 
         Button btnSave = findViewById(R.id.btnGuardar);

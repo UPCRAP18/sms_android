@@ -15,8 +15,8 @@
         android:icon="@drawable/stadistics_nav"
         android:title="@string/nb_estadisticas" />
     <item
-        android:id="@+id/btnStudents"
+        android:id="@+id/btnInfo"
         android:color="@color/colorPrimary"
-        android:icon="@drawable/student_nav"
-        android:title="@string/nb_students" />
+        android:icon="@drawable/info"
+        android:title="@string/nb_info" />
 </menu>

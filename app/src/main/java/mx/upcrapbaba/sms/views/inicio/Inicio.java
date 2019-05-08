@@ -44,6 +44,7 @@ import mx.upcrapbaba.sms.models.Asignatura;
 import mx.upcrapbaba.sms.models.Grupo;
 import mx.upcrapbaba.sms.models.User;
 import mx.upcrapbaba.sms.sqlite.DBHelper;
+import mx.upcrapbaba.sms.views.personalizacion.Add_Edit_Alumnos;
 import mx.upcrapbaba.sms.views.personalizacion.Add_Edit_Asignaturas;
 import mx.upcrapbaba.sms.views.personalizacion.Add_Edit_Grupos;
 import mx.upcrapbaba.sms.views.user_settings.User_Profile;
@@ -84,7 +85,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         if (new NetworkStatus(this).getTypeConnection() == 0) {
             mDialog.message(R.string.no_Net, null, false, 1);
             mDialog.negativeButton(R.string.reintentar, null, materialDialog -> {
-                startActivity(new Intent(this, Inicio.class));
+                startActivity(new Intent(Inicio.this, Inicio.class));
                 this.overridePendingTransition(0, 0);
                 this.finish();
                 return Unit.INSTANCE;
@@ -135,7 +136,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         });
 
         fab_Add_Alumno.setOnClickListener(v -> {
-
+            startActivityForResult(new Intent(Inicio.this, Add_Edit_Alumnos.class).putExtra("SELECCIONADO", "Alumnos"), RESULT_POPUP);
         });
 
         fab_Add_Grupo.setOnClickListener(v -> {
@@ -348,6 +349,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
             user_photo.setOnClickListener(v -> {
                 startActivity(new Intent(Inicio.this, User_Profile.class));
                 overridePendingTransition(R.anim.left_in, R.anim.left_out);
+                Inicio.this.finish();
             });
 
 

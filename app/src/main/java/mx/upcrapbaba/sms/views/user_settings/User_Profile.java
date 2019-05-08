@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -25,6 +26,7 @@ import mx.upcrapbaba.sms.api.Service.SMSService;
 import mx.upcrapbaba.sms.extras.Alert_Dialog;
 import mx.upcrapbaba.sms.models.User;
 import mx.upcrapbaba.sms.sqlite.DBHelper;
+import mx.upcrapbaba.sms.views.inicio.Inicio;
 import mx.upcrapbaba.sms.views.sesion.Login;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -66,8 +68,6 @@ public class User_Profile extends AppCompatActivity {
             if(new DBHelper(User_Profile.this).dropUsr()){
                 startActivity(new Intent(User_Profile.this, Login.class));
                 User_Profile.this.finish();
-                //TODO handle de donde viene
-                //Inicio.class.
             }else {
                 Toasty.warning(User_Profile.this, "Ha ocurrido un error al cerrar sesion").show();
             }
@@ -193,5 +193,20 @@ public class User_Profile extends AppCompatActivity {
 
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(User_Profile.this, Inicio.class));
+        User_Profile.this.finish();
     }
 }

@@ -24,7 +24,7 @@
     <!-- Navigation Bar -->
     <string name="nb_home">Inicio</string>
     <string name="nb_estadisticas">Estadisticas</string>
-    <string name="nb_students">Alumnos</string>
+    <string name="nb_info">Informacion</string>
 
 
     <!-- Pagina principal -->
@@ -99,6 +99,13 @@
     <string name="btnAdd_To_Asign">Agregar a   asignatura</string>
     <string name="asign_to_add_grupo">Añadir grupo a la asignatura:</string>
     <string name="warn_nombre_grupo">Por favor introduzca un nombre de grupo</string>
+
+    <!-- Añadir/Editar Alumnos -->
+    <string name="lblSelect_alumno">Seleccionar Alumno</string>
+    <string name="ht_matricula_alumno">Matricula Alumno</string>
+    <string name="lblInscrito_grupos">Inscrito en los grupos</string>
+    <string name="ht_nombre_alumno">Nombre Alumno</string>
+    <string name="ht_apellidos_alumno">Apellidos</string>
 
 
 </resources>
