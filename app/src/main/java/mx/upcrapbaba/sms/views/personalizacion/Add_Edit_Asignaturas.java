@@ -89,9 +89,11 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(getResources().getString(R.string.barTitle, SELECCIONADO));
+            if (getIntent().getStringExtra("SELECCIONADO") != null) {
+                SELECCIONADO = getIntent().getStringExtra("SELECCIONADO");
+                getSupportActionBar().setTitle(getResources().getString(R.string.barTitle, SELECCIONADO));
+            }
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         } else {
             System.out.println("Ha ocurrido un error al inicializar la barra de titulo");
             Alert_Dialog.showErrorMessage(Add_Edit_Asignaturas.this);

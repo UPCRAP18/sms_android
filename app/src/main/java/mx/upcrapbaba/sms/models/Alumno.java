@@ -62,4 +62,18 @@ public class Alumno {
     public void setCalificaciones(String[] calificaciones) {
         this.calificaciones = calificaciones;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Alumno) {
+            return ((Alumno) obj).matricula_alumno.equals(matricula_alumno);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.parseInt(this.matricula_alumno);
+    }
+
 }

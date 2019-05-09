@@ -81,6 +81,13 @@ public interface SMSService {
     @POST("/grupos/")
     Call<JsonObject> add_grupo(@Body JsonObject data, @Header("Authorization") String token);
 
+    @Headers({
+            "Content-Type: application/json",
+            "Accept: x-www-form-urlencoded"
+    })
+    @POST("/alumnos/")
+    Call<JsonObject> add_alumno(@Body JsonObject data, @Header("Authorization") String token);
+
     /* Peticiones PATCH a sms-api-v1 */
 
     @Headers({

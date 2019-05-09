@@ -82,78 +82,27 @@
                 android:textColor="@color/indigo_material" />
         </LinearLayout>
 
-        <LinearLayout
+        <EditText
+            android:id="@+id/etNombre_Alumno"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_margin="8dp"
+            android:ems="10"
+            android:hint="@string/ht_nombre_alumno"
+            android:inputType="textPersonName"
+            android:textAlignment="center"
+            android:textColor="@color/indigo_material" />
 
-            <EditText
-                android:id="@+id/etNombre_Alumno"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:ems="10"
-                android:hint="@string/ht_nombre_alumno"
-                android:inputType="textPersonName"
-                android:textAlignment="center"
-                android:textColor="@color/indigo_material" />
-
-            <EditText
-                android:id="@+id/etApellidos_Alumno"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:ems="10"
-                android:hint="@string/ht_apellidos_alumno"
-                android:inputType="textPersonName"
-                android:textAlignment="center"
-                android:textColor="@color/indigo_material" />
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/Layout_Inscritos"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/layButtons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
-
-        <TextView
-            android:id="@+id/txtGrupos_Inscrito"
+        <EditText
+            android:id="@+id/etApellidos_Alumno"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:fontFamily="@font/andika"
-            android:gravity="center"
-            android:text="@string/lblInscrito_grupos"
-            android:textColor="@color/indigo_material"
-            android:textSize="18sp" />
-
-        <ListView
-            android:id="@+id/lstGrupos_Alumno"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_weight="1"
-            android:divider="@color/divider"
-            android:dividerHeight="4dp">
-
-        </ListView>
+            android:layout_margin="8dp"
+            android:ems="10"
+            android:hint="@string/ht_apellidos_alumno"
+            android:inputType="textPersonName"
+            android:textAlignment="center"
+            android:textColor="@color/indigo_material" />
 
 
     </LinearLayout>
@@ -177,7 +126,7 @@
             android:layout_weight="2" />
 
         <Button
-            android:id="@+id/btnGuardar"
+            android:id="@+id/btnGuardar_Alumno"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"

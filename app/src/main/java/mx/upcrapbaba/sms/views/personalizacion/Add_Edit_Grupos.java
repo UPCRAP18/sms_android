@@ -73,26 +73,17 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
         token = "Bearer " + new DBHelper(this).getData_Usuario().get(1);
         id_usuario = new DBHelper(this).getData_Usuario().get(0);
 
-        if (getIntent().getExtras() != null) {
-            SELECCIONADO = getIntent().getStringExtra("SELECCIONADO");
-        } else {
-            Alert_Dialog.showWarnMessage(Add_Edit_Grupos.this, getString(R.string.header_warning), getString(R.string.request_error))
-                    .positiveButton(R.string.aceptar, null, materialDialog -> {
-                        startActivity(new Intent(Add_Edit_Grupos.this, Add_Edit_Grupos.class));
-                        Add_Edit_Grupos.this.finish();
-                        return Unit.INSTANCE;
-                    }).show();
-
-        }
 
         Toolbar toolbar = findViewById(R.id.ToolBar);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(getResources().getString(R.string.barTitle, SELECCIONADO));
+            if (getIntent().getStringExtra("SELECCIONADO") != null) {
+                SELECCIONADO = getIntent().getStringExtra("SELECCIONADO");
+                getSupportActionBar().setTitle(getResources().getString(R.string.barTitle, SELECCIONADO));
+            }
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         } else {
             System.out.println("Ha ocurrido un error al inicializar la barra de titulo");
             Alert_Dialog.showErrorMessage(Add_Edit_Grupos.this);
@@ -236,19 +227,15 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
     }
 
     private void actualizar_grupo() {
-        int index = spGrupos.getSelectedItemPosition() - 1;
-        if (index < 0) {
-            index++;
-        } else if (index > asignaturas_repeated.size()) {
-            index--;
-        }
+        int index = spGrupos.getSelectedItemPosition();
+
         asignatura_seleccionada = asignaturas_repeated.get(index);
 
         //System.out.println("Se va a actualizar el grupo: " + grupo_seleccionado.getNombre_grupo() + " en la materia: " + asignatura_seleccionada.getNombre_materia() );
         if (!etNombre_Grupo.getText().toString().isEmpty()) {
             grupos_original.remove(grupo_seleccionado);
             grupo_seleccionado.setNombre_grupo(etNombre_Grupo.getText().toString());
-            grupo_seleccionado.setAlumnos((JsonArray) new Gson().toJsonTree(alumnos_grupo, new TypeToken<List<Alumno>>() {
+            grupo_seleccionado.setAlumnos((JsonArray) new Gson().toJsonTree(alumnos_to_add, new TypeToken<List<Alumno>>() {
             }.getType()));
 
             grupos_original.add(grupo_seleccionado);
