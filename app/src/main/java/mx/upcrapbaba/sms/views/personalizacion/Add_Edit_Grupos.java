@@ -110,7 +110,6 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
                     asignaturas_original = new Gson().fromJson(user_data.getMaterias(), new TypeToken<List<Asignatura>>() {
                     }.getType());
 
-                    asignaturas_temporal.addAll(asignaturas_original);
 
                     for (int i = 0; i < asignaturas_original.size(); i++) {
                         List<Grupo> grupo_asignatura = new Gson()
@@ -137,6 +136,7 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
                             btnEliminar_Alumnos.setEnabled(true);
                             editCriterios();
                             grupo_seleccionado = grupos_original.get(spGrupos.getSelectedItemPosition());
+                            asignatura_seleccionada = asignaturas_repeated.get(spGrupos.getSelectedItemPosition());
                             loadDataSpinner(grupo_seleccionado);
                         } else {
                             btnEliminar_Alumnos.setEnabled(false);
@@ -151,7 +151,6 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                                     asignatura_seleccionada = asignaturas_original.get(position);
-                                    System.out.println(asignatura_seleccionada.getNombre_materia());
                                 }
 
                                 @Override
@@ -227,24 +226,55 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
     }
 
     private void actualizar_grupo() {
-        int index = spGrupos.getSelectedItemPosition();
-
-        asignatura_seleccionada = asignaturas_repeated.get(index);
-
-        //System.out.println("Se va a actualizar el grupo: " + grupo_seleccionado.getNombre_grupo() + " en la materia: " + asignatura_seleccionada.getNombre_materia() );
         if (!etNombre_Grupo.getText().toString().isEmpty()) {
-            grupos_original.remove(grupo_seleccionado);
-            grupo_seleccionado.setNombre_grupo(etNombre_Grupo.getText().toString());
-            grupo_seleccionado.setAlumnos((JsonArray) new Gson().toJsonTree(alumnos_to_add, new TypeToken<List<Alumno>>() {
+            //ArrayDeque<Grupo> grupos_temporal = new ArrayDeque<>();
+            ArrayDeque<Asignatura> asignaturas_temporal = new ArrayDeque<>(asignaturas_original);
+            List<Grupo> grupos_asignatura = new LinkedList<>(new Gson().fromJson(asignatura_seleccionada.getGrupos(), new TypeToken<List<Grupo>>() {
             }.getType()));
 
-            grupos_original.add(grupo_seleccionado);
-            //TODO no te hagas wey Rodrigo, solo falta 1) Agregar los datos al grupo seleccionado, actualizar la lista de grupos y actualizar la informacion del perfil
-            asignaturas_original.remove(asignatura_seleccionada);
+            for (int i = 0; i < grupos_asignatura.size(); i++) {
+                if (grupo_seleccionado.getNombre_grupo().equals(grupos_asignatura.get(i).getNombre_grupo())) {
+                    grupos_asignatura.remove(i);
+                    break;
+                }
+            }
+
+            asignaturas_temporal.remove(asignatura_seleccionada);
+
+            grupos_original.clear();
+            asignaturas_original.clear();
+
+            grupo_seleccionado.setNombre_grupo(etNombre_Grupo.getText().toString());
+            if (!alumnos_to_add.isEmpty()) {
+                JsonArray alumnos_original = grupo_seleccionado.getAlumnos();
+                JsonArray alumnos_updated = (JsonArray) new Gson().toJsonTree(alumnos_to_add, new TypeToken<List<Alumno>>() {
+                }.getType());
+                alumnos_original.add(alumnos_updated);
+                grupo_seleccionado.setAlumnos(alumnos_updated);
+
+            }
+
+            if (!alumnos_to_remove.isEmpty()) {
+                List<Alumno> alumnos_original = new Gson().fromJson(grupo_seleccionado.getAlumnos(), new TypeToken<List<Alumno>>() {
+                }.getType());
+
+                alumnos_original.removeAll(alumnos_to_remove);
+
+                grupo_seleccionado.setAlumnos((JsonArray) new Gson().toJsonTree(alumnos_original, new TypeToken<List<Alumno>>() {
+                }.getType()));
+
+            }
+
+            grupos_asignatura.add(grupo_seleccionado);
+
+            grupos_original.addAll(grupos_asignatura);
+
             asignatura_seleccionada.setGrupos((JsonArray) new Gson().toJsonTree(grupos_original, new TypeToken<List<Grupo>>() {
             }.getType()));
 
-            asignaturas_original.add(asignatura_seleccionada);
+            asignaturas_temporal.add(asignatura_seleccionada);
+
+            asignaturas_original.addAll(asignaturas_temporal);
 
             JsonObject user_update = new JsonObject();
 
@@ -255,7 +285,7 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
 
             sms_service.update_data(user_update, token, id_usuario).enqueue(new Callback<JsonObject>() {
                 @Override
-                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         Alert_Dialog.showWarnMessage(Add_Edit_Grupos.this, "¡Actualizacion correcta", "Se ha actualizado correctamente la informacion de usuario")
                                 .positiveButton(R.string.aceptar, null, materialDialog -> {

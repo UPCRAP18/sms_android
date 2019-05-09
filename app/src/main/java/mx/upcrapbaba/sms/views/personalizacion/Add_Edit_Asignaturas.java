@@ -237,15 +237,12 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
                     if (asignatura_seleccionada.getNombre_materia().equals("Agregar nueva asignatura")) {
                         System.out.println("No hay ninguna asignatura que actualizar, actualizando los valores en el arreglo");
                     } else {
-                        //Actualizo los valores del seleccionado, elimino el original y subo el nuevo, respetando los indices
-                        int index = asignaturas_original.indexOf(asignatura_seleccionada);
-                        if (index < 0) {
-                            index++;
-                        } else if (index >= asignaturas_original.size()) {
-                            index--;
-                        }
-                        asignaturas.remove(index);
-                        asignaturas_original.remove(index);
+                        asignaturas.remove(asignatura_seleccionada);
+                        ArrayDeque<Asignatura> asignaturas_temporal = new ArrayDeque<>(asignaturas);
+                        asignaturas_temporal.removeLast();
+                        //asignaturas_temporal.remove(asignatura_seleccionada);
+                        asignaturas_original.clear();
+                        asignaturas_original.addAll(asignaturas_temporal);
                         asignatura_seleccionada.setCodigo_materia(codigo_mat);
                         asignatura_seleccionada.setNombre_materia(nombre_mat);
                         JsonArray grupos_asignatura = asignatura_seleccionada.getGrupos();
@@ -255,7 +252,7 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
                             grupos_asignatura.add(grupos.get(0));
                         }
                         asignatura_seleccionada.setGrupos(grupos_asignatura);
-                        asignaturas_original.add(index, asignatura_seleccionada);
+                        asignaturas_original.add(asignatura_seleccionada);
                     }
 
                     new AlertDialog.Builder(Add_Edit_Asignaturas.this)

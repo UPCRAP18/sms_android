@@ -178,7 +178,7 @@ public class Add_Edit_Alumnos extends AppCompatActivity {
                     @Override
                     public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
                         if (response.isSuccessful() && response.body() != null) {
-                            Toasty.success(Add_Edit_Alumnos.this, "Se ha creado correctamente").show();
+                            //Alert_Dialog.showMessage(Add_Edit_Alumnos.this, getString(R.string));
                             Add_Edit_Alumnos.this.recreate();
                         } else {
                             Toasty.warning(Add_Edit_Alumnos.this, "Ha ocurrido un error").show();

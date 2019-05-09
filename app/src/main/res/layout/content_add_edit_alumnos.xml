@@ -67,7 +67,7 @@
                 android:id="@+id/imgAlumno_Edit"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                app:srcCompat="@drawable/materia_holder" />
+                app:srcCompat="@drawable/profile_holder" />
 
             <EditText
                 android:id="@+id/etMatricula_Alumno"
