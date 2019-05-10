@@ -15,12 +15,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
+        <activity android:name=".views.inicio.Information" android:parentActivityName=".views.inicio.Inicio" />
         <activity
             android:name=".views.personalizacion.Add_Edit_Alumnos"
             android:parentActivityName=".views.inicio.Inicio" />
         <activity
             android:name=".views.personalizacion.Add_Edit_Grupos"
-            android:label="@string/title_activity_add__edit__grupos"
             android:parentActivityName=".views.inicio.Inicio"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

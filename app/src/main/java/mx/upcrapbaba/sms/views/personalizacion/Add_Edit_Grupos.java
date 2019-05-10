@@ -422,25 +422,21 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
 
     @Override
     public void OnAlumnoSelected(Alumno alumno_seleccionado) {
-        //Toasty.info(Add_Edit_Grupos.this, "Alumno local seleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
         alumnos_to_remove.add(alumno_seleccionado);
     }
 
     @Override
     public void OnAlumnoDeselected(Alumno alumno_seleccionado) {
-        //Toasty.info(Add_Edit_Grupos.this, "Alumno local deseleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
         alumnos_to_remove.remove(alumno_seleccionado);
     }
 
     @Override
     public void OnAlumnoOnlineSelected(Alumno alumno_seleccionado) {
-        //Toasty.info(Add_Edit_Grupos.this, "Alumno online seleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
         alumnos_to_add.add(alumno_seleccionado);
     }
 
     @Override
     public void OnAlumnoOnlineDeselected(Alumno alumno_seleccionado) {
-        //Toasty.info(Add_Edit_Grupos.this, "Alumno online deseleccionado: " + alumno_seleccionado.getNombre_alumno()).show();
         alumnos_to_add.remove(alumno_seleccionado);
     }
 

@@ -111,8 +111,13 @@
     <string name="lblSMS">
         SMS (Service Management Student) es un servicio back-end y front-end
         que esta enfocado hacia la ayuda de docentes.\n\n
-        SMS contiene un control de calificaciones por alunmno,
+        SMS lleva el control de calificaciones por alumno,
         un generador de estadisticas y un control de las materias que imparte el docente.
     </string>
+    <string name="lblDevelop_Team">Equipo de desarrollo</string>
+    <string name="lblNombre_Rodrigo">Alvarez Pérez Rodrigo</string>
+    <string name="lblNombre_Akari">Balderas Aguilera Brenda Akari</string>
+    <string name="lblNombre_Uriel">Perez Cubias Uriel</string>
+    <string name="lblsms_explicacion">¿Qué es SMS?</string>
 
 </resources>
