@@ -107,5 +107,12 @@
     <string name="ht_nombre_alumno">Nombre Alumno</string>
     <string name="ht_apellidos_alumno">Apellidos</string>
 
+    <!--  Informacion  -->
+    <string name="lblSMS">
+        SMS (Service Management Student) es un servicio back-end y front-end
+        que esta enfocado hacia la ayuda de docentes.\n\n
+        SMS contiene un control de calificaciones por alunmno,
+        un generador de estadisticas y un control de las materias que imparte el docente.
+    </string>
 
 </resources>
