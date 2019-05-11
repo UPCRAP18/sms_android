@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
@@ -25,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
+import kotlin.Unit;
 import mx.upcrapbaba.sms.R;
 import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.api.Service.SMSService;
@@ -165,7 +167,75 @@ public class Add_Edit_Alumnos extends AppCompatActivity {
     private void saveChanges() {
         if (validateFields()) {
             if (alumno_seleccionado != null) {
-                //Actualizar datos
+                Alumno alumno_add = new Alumno();
+                alumno_add.setNombre_alumno(etNombre_Alumno.getText().toString());
+                alumno_add.setMatricula_alumno(etMatricula_Alumno.getText().toString());
+                alumno_add.setApellidos(etApellidos_Alumno.getText().toString());
+                alumno_add.setImagen_alumno("profile_images/profile_holder.png");
+                alumno_add.setCalificaciones(alumno_seleccionado.getCalificaciones());
+
+                for (int i = 0; i < asignaturas_original.size(); i++) {
+                    Asignatura asignatura_actual = asignaturas_original.get(i);
+                    ArrayList<Grupo> grupos_in_asign = new Gson().fromJson(asignaturas_original.get(i).getGrupos(), new TypeToken<ArrayList<Grupo>>() {
+                    }.getType());
+                    for (int j = 0; j < grupos_in_asign.size(); j++) {
+                        Grupo grupo_actual = grupos_in_asign.get(j);
+                        ArrayList<Alumno> alumnos = new Gson().fromJson(grupos_in_asign.get(j).getAlumnos(), new TypeToken<ArrayList<Alumno>>() {
+                        }.getType());
+                        for (int k = 0; k < alumnos.size(); k++) {
+                            Alumno alumno_actual = alumnos.get(k);
+                            if (alumno_actual.getMatricula_alumno().equals(alumno_seleccionado.getMatricula_alumno())) {
+                                alumnos.remove(alumno_actual);
+                                alumnos.add(alumno_add);
+                                k--;
+                                grupos_in_asign.remove(grupo_actual);
+                                grupo_actual.setAlumnos((JsonArray) new Gson().toJsonTree(alumnos, new TypeToken<List<Alumno>>() {
+                                }.getType()));
+                                grupos_in_asign.add(grupo_actual);
+                                j--;
+                                asignaturas_original.remove(asignatura_actual);
+                                JsonArray grupos_nuevos = (JsonArray) new Gson().toJsonTree(grupos_in_asign, new TypeToken<List<Grupo>>() {
+                                }.getType());
+                                asignatura_actual.setGrupos(grupos_nuevos);
+                                asignaturas_original.add(asignatura_actual);
+                                i--;
+                            }
+                        }
+                    }
+                }
+
+                JsonObject user_update = new JsonObject();
+
+                JsonArray asignaturas_array = (JsonArray) new Gson().toJsonTree(asignaturas_original,
+                        new TypeToken<List<Asignatura>>() {
+                        }.getType());
+
+                user_update.add("materias", asignaturas_array);
+
+                sms_service.update_data(user_update, token, id_usuario).enqueue(new Callback<JsonObject>() {
+                    @Override
+                    public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            Alert_Dialog.showWarnMessage(Add_Edit_Alumnos.this, "¡Correcto!", "Se han actualizado los alumnos")
+                                    .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                        Add_Edit_Alumnos.this.recreate();
+                                        return Unit.INSTANCE;
+                                    }).show();
+
+                        } else {
+                            Toasty.warning(Add_Edit_Alumnos.this, "Ha ocurrido un error al actualizar los alumnos").show();
+                            System.out.println("Error al actualizar los datos del usuario " + response.errorBody());
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+                        Toasty.warning(Add_Edit_Alumnos.this, "Ha ocurrido un error en la request para actualizar los datos").show();
+                        System.out.println("Error al actualizar los datos del usuario " + t.getMessage());
+                    }
+                });
+
             } else {
                 //Crear un nuevo alumno
                 JsonObject data_alumno = new JsonObject();

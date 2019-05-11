@@ -15,6 +15,9 @@ public class Alumno {
     @Expose
     private String[] calificaciones;
 
+    public Alumno() {
+    }
+
     public Alumno(String matricula_alumno, String nombre_alumno, String apellidos, String imagen_alumno, String[] calificaciones) {
         this.matricula_alumno = matricula_alumno;
         this.nombre_alumno = nombre_alumno;

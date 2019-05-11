@@ -49,6 +49,7 @@ dependencies {
     implementation 'com.afollestad.material-dialogs:core:2.0.0-rc7'
     implementation 'com.github.mancj:MaterialSearchBar:0.8.1'
     implementation 'com.getbase:floatingactionbutton:1.10.1'
+    implementation 'com.github.AnyChart:AnyChart-Android:1.1.2'
 
 
 }

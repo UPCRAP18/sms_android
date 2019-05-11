@@ -12,9 +12,9 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.util.LinkedList;
 import java.util.List;
 
-import es.dmoral.toasty.Toasty;
 import mx.upcrapbaba.sms.R;
 import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.models.Alumno;
@@ -22,12 +22,14 @@ import mx.upcrapbaba.sms.models.Alumno;
 public class Alumnos_GeneralList_Adapter implements ListAdapter {
     private List<Alumno> dataSet;
     private Context mContext;
+    private FilterStudentsAdapterListener studentListener;
 
-    public Alumnos_GeneralList_Adapter(List<Alumno> dataSet, Context mContext) {
+    public Alumnos_GeneralList_Adapter(List<Alumno> dataSet, Context mContext, FilterStudentsAdapterListener student_Listener) {
         this.dataSet = dataSet;
         this.mContext = mContext;
-    }
+        this.studentListener = student_Listener;
 
+    }
 
     @Override
     public boolean areAllItemsEnabled() {
@@ -76,10 +78,7 @@ public class Alumnos_GeneralList_Adapter implements ListAdapter {
         if (convertView == null) {
             LayoutInflater layoutInflater = LayoutInflater.from(mContext);
             convertView = layoutInflater.inflate(R.layout.alumnos_list_content, null);
-            convertView.setOnClickListener(v -> {
-                Toasty.success(mContext, "Se ha clickeado en el alumno " + alumno_actual.getNombre_alumno()).show();
-
-            });
+            convertView.setOnClickListener(v -> studentListener.onStudentSelected(alumno_actual));
 
             TextView txtMatricula = convertView.findViewById(R.id.txtMatricula_Alumno);
             TextView txtNombre = convertView.findViewById(R.id.txtNombre_Alumno);
@@ -114,4 +113,26 @@ public class Alumnos_GeneralList_Adapter implements ListAdapter {
     public boolean isEmpty() {
         return false;
     }
+
+    public List<Alumno> getfilterData(String charText) {
+        //charText = charText.toLowerCase(Locale.getDefault());
+        List<Alumno> filterResults = new LinkedList<>();
+        if (charText.length() == 0) {
+            filterResults.addAll(dataSet);
+        } else {
+            for (Alumno alumno : dataSet) {
+                if (alumno.getNombre_alumno().toLowerCase().contains(charText)
+                        || alumno.getMatricula_alumno().contains(charText)) {
+                    filterResults.add(alumno);
+                }
+            }
+        }
+
+        return filterResults;
+    }
+
+    public interface FilterStudentsAdapterListener {
+        void onStudentSelected(Alumno alumno_seleccionado);
+    }
+
 }

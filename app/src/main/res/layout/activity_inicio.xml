@@ -120,22 +120,6 @@
         app:lottie_fileName="empty_list.json"
         app:lottie_loop="true" />
 
-    <TextView
-        android:id="@+id/lblAlumnos"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:fontFamily="@font/andika"
-        android:text="@string/lblAlumnos"
-        android:textColor="@color/purple_material"
-        android:textSize="20sp"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
-
     <com.wang.avi.AVLoadingIndicatorView
         android:id="@+id/PBar_Main"
         android:layout_width="wrap_content"
@@ -147,6 +131,41 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/layAlumnos"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+        <TextView
+            android:id="@+id/lblAlumnos"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/andika"
+            android:text="@string/lblAlumnos"
+            android:textColor="@color/purple_material"
+            android:textSize="20sp"
+            android:visibility="visible" />
+
+        <com.mancj.materialsearchbar.MaterialSearchBar
+            android:id="@+id/searchBarAlumnos"
+            style="@style/MaterialSearchBarLight"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            app:mt_hint="Buscar alumno..."
+            app:mt_placeholder="Buscar alumno..." />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/txtError_Message"
@@ -169,12 +188,12 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:dividerHeight="2dp"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblAlumnos">
+        app:layout_constraintTop_toBottomOf="@+id/layAlumnos">
 
     </ListView>
 

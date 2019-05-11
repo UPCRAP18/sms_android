@@ -3,12 +3,15 @@ package mx.upcrapbaba.sms.views.inicio;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -24,12 +27,16 @@ import com.bumptech.glide.request.RequestOptions;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.wang.avi.AVLoadingIndicatorView;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import es.dmoral.toasty.Toasty;
 import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
 import kotlin.Unit;
 import mx.upcrapbaba.sms.R;
@@ -52,14 +59,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenuItemSelectionListener {
+public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenuItemSelectionListener, Alumnos_GeneralList_Adapter.FilterStudentsAdapterListener {
 
-    private BottomNavigation nav_bar;
     private AVLoadingIndicatorView pbar;
     private String token, id_usuario;
     private ListView lstAlumnos;
     private LottieAnimationView anim_empty_list;
-    private TextView txtError_Message, lblAlumnos;
+    private TextView txtError_Message;
     private User user_data;
     private ImageView imgUsuario;
     private Spinner spAsignaturas, spGrupos;
@@ -68,6 +74,9 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
     private List<Alumno> alumnos = new LinkedList<>();
     private List<String> nombre_grupos = new LinkedList<>();
     private int RESULT_POPUP = 0;
+    private LinearLayout layAlumnos;
+    private Alumnos_GeneralList_Adapter alumnos_adapter;
+    private MaterialSearchBar mSearchBar;
 
     /**
      * Comprueba el estado de la red del telefono
@@ -109,7 +118,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
 
         getUserInfo(sms_service);
 
-        nav_bar = findViewById(R.id.bottom_nav_bar);
+        BottomNavigation nav_bar = findViewById(R.id.bottom_nav_bar);
 
         nav_bar.setDefaultSelectedIndex(0);
 
@@ -124,7 +133,8 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
 
         anim_empty_list = findViewById(R.id.empty_list);
         txtError_Message = findViewById(R.id.txtError_Message);
-        lblAlumnos = findViewById(R.id.lblAlumnos);
+        layAlumnos = findViewById(R.id.layAlumnos);
+        mSearchBar = findViewById(R.id.searchBarAlumnos);
 
         FloatingActionButton fab_Add_Alumno = findViewById(R.id.fabAddAlumno);
         FloatingActionButton fab_Add_Asignatura = findViewById(R.id.fabAddAsignatura);
@@ -155,6 +165,26 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
             Alert_Dialog.showErrorMessage(this);
         }
 
+
+        mSearchBar.addTextChangeListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Alumnos_GeneralList_Adapter filterResults =
+                        new Alumnos_GeneralList_Adapter(alumnos_adapter.getfilterData(s.toString()), Inicio.this, Inicio.this);
+                lstAlumnos.setAdapter(filterResults);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
     }
 
     /**
@@ -179,9 +209,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
      */
     @Override
     public void onMenuItemReselect(int i, int i1, boolean b) {
-        startActivity(new Intent(Inicio.this, Inicio.class));
-        overridePendingTransition(0, 0);
-        Inicio.this.finish();
+        Inicio.this.recreate();
     }
 
     /**
@@ -194,8 +222,18 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
     //TODO Actualizar para lograr la navegacion
     @Override
     public void onMenuItemSelect(int i, int i1, boolean b) {
-        nav_bar.setSelectedIndex(i);
-        nav_bar.setSelected(true);
+        switch (i1) {
+            case 1:
+                startActivity(new Intent(Inicio.this, Estadisticas.class));
+                overridePendingTransition(R.anim.left_in, R.anim.left_out);
+                this.finish();
+                break;
+            case 2:
+                startActivity(new Intent(Inicio.this, Information.class));
+                overridePendingTransition(R.anim.left_in, R.anim.left_out);
+                this.finish();
+                break;
+        }
     }
 
     /**
@@ -209,7 +247,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
 
         user_info.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(@NotNull Call<User> call, @NotNull Response<User> response) {
                 pbar.smoothToShow();
                 if (response.isSuccessful() && response.body() != null) {
                     user_data = response.body();
@@ -218,17 +256,19 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
                     asignaturas = new Gson().fromJson(user_data.getMaterias(), new TypeToken<List<Asignatura>>() {
                     }.getType());
 
-                    lblAlumnos.setVisibility(View.GONE);
                     lstAlumnos.setAdapter(new ArrayAdapter<>(Inicio.this, android.R.layout.simple_list_item_1));
 
                     if (asignaturas.isEmpty()) {
+                        layAlumnos.setVisibility(View.INVISIBLE);
                         anim_empty_list.playAnimation();
                         anim_empty_list.setVisibility(View.VISIBLE);
                         txtError_Message.setText(R.string.err_asignatura);
                         txtError_Message.setVisibility(View.VISIBLE);
                         spAsignaturas.setEnabled(false);
                         pbar.smoothToHide();
+
                     } else {
+                        layAlumnos.setVisibility(View.VISIBLE);
                         spAsignaturas.setAdapter(new Asignaturas_General_Adapter(Inicio.this, R.layout.asignatura_item, asignaturas));
                         setOnSelectedListener();
                     }
@@ -241,7 +281,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(@NotNull Call<User> call, @NotNull Throwable t) {
                 pbar.smoothToHide();
                 Alert_Dialog.showErrorMessage(Inicio.this);
                 System.out.println(t.toString());
@@ -262,7 +302,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
                 grupos = new Gson().fromJson(asignatura_seleccionada.getGrupos(), new TypeToken<List<Grupo>>() {
                 }.getType());
                 nombre_grupos.clear();
-                lblAlumnos.setVisibility(View.GONE);
+
                 lstAlumnos.setAdapter(new ArrayAdapter<>(Inicio.this, android.R.layout.simple_list_item_1));
                 spGrupos.setAdapter(new ArrayAdapter<>(Inicio.this, R.layout.custom_spinner, new ArrayList<>()));
                 for (Grupo grupo : grupos) {
@@ -270,6 +310,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
                 }
 
                 if (grupos.isEmpty()) {
+                    layAlumnos.setVisibility(View.INVISIBLE);
                     spGrupos.setEnabled(false);
                     anim_empty_list.playAnimation();
                     anim_empty_list.setVisibility(View.VISIBLE);
@@ -277,6 +318,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
                     txtError_Message.setVisibility(View.VISIBLE);
                     pbar.smoothToHide();
                 } else {
+                    layAlumnos.setVisibility(View.VISIBLE);
                     spGrupos.setEnabled(true);
                     anim_empty_list.setVisibility(View.GONE);
                     txtError_Message.setVisibility(View.GONE);
@@ -310,14 +352,15 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
                     anim_empty_list.setVisibility(View.VISIBLE);
                     txtError_Message.setText(R.string.err_alumnos);
                     txtError_Message.setVisibility(View.VISIBLE);
-                    lblAlumnos.setVisibility(View.GONE);
+                    layAlumnos.setVisibility(View.INVISIBLE);
                     lstAlumnos.setAdapter(new ArrayAdapter<>(Inicio.this, android.R.layout.simple_list_item_1));
                     pbar.smoothToHide();
                 } else {
                     anim_empty_list.setVisibility(View.GONE);
                     txtError_Message.setVisibility(View.GONE);
-                    lblAlumnos.setVisibility(View.VISIBLE);
-                    lstAlumnos.setAdapter(new Alumnos_GeneralList_Adapter(alumnos, Inicio.this));
+                    layAlumnos.setVisibility(View.VISIBLE);
+                    alumnos_adapter = new Alumnos_GeneralList_Adapter(alumnos, Inicio.this, Inicio.this);
+                    lstAlumnos.setAdapter(alumnos_adapter);
                     pbar.smoothToHide();
                 }
 
@@ -359,5 +402,9 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
     }
 
 
+    @Override
+    public void onStudentSelected(Alumno alumno_seleccionado) {
+        Toasty.info(Inicio.this, alumno_seleccionado.getMatricula_alumno()).show();
+    }
 }
 

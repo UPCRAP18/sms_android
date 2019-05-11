@@ -119,5 +119,9 @@
     <string name="lblNombre_Akari">Balderas Aguilera Brenda Akari</string>
     <string name="lblNombre_Uriel">Perez Cubias Uriel</string>
     <string name="lblsms_explicacion">¿Qué es SMS?</string>
+    <string name="tabInfo_Title">Informacion de la aplicacion</string>
+
+    <!-- Estadisticas -->
+    <string name="title_activity_Estadisticas">Estadisticas</string>
 
 </resources>
