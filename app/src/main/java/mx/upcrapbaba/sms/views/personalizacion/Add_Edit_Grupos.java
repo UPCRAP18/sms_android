@@ -3,12 +3,15 @@ package mx.upcrapbaba.sms.views.personalizacion;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -30,14 +33,18 @@ import java.util.List;
 import es.dmoral.toasty.Toasty;
 import kotlin.Unit;
 import mx.upcrapbaba.sms.R;
+import mx.upcrapbaba.sms.adaptadores.listviews.Actividades_Adapter;
 import mx.upcrapbaba.sms.adaptadores.listviews.AlumnosOnline_EditGrupo_Adapter;
 import mx.upcrapbaba.sms.adaptadores.listviews.Alumnos_EditGrupo_Adapter;
 import mx.upcrapbaba.sms.adaptadores.spinners.Asignaturas_General_Adapter;
 import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.api.Service.SMSService;
 import mx.upcrapbaba.sms.extras.Alert_Dialog;
+import mx.upcrapbaba.sms.models.Actividad;
 import mx.upcrapbaba.sms.models.Alumno;
 import mx.upcrapbaba.sms.models.Asignatura;
+import mx.upcrapbaba.sms.models.Calificacion;
+import mx.upcrapbaba.sms.models.Criterio;
 import mx.upcrapbaba.sms.models.Grupo;
 import mx.upcrapbaba.sms.models.User;
 import mx.upcrapbaba.sms.sqlite.DBHelper;
@@ -45,24 +52,28 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGrupo_Adapter.AlumnoListener, AlumnosOnline_EditGrupo_Adapter.AlumnoOnlineListener {
+public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGrupo_Adapter.AlumnoListener, AlumnosOnline_EditGrupo_Adapter.AlumnoOnlineListener, Actividades_Adapter.ItemSelected {
 
-    private String SELECCIONADO = "", token = "", id_usuario = "";
+    private String token = "", id_usuario = "", PARCIAL_SELECCIONADO = "";
     private User user_data;
     private List<Asignatura> asignaturas_original = new LinkedList<>(), asignaturas_repeated = new LinkedList<>();
     private ArrayDeque<Asignatura> asignaturas_temporal = new ArrayDeque<>();
     private List<Grupo> grupos_original = new LinkedList<>();
     private List<Alumno> alumnos_grupo = new LinkedList<>(), alumnos_to_remove = new LinkedList<>(), alumnos_to_add = new LinkedList<>();
+    private List<Criterio> criterios_grupo_general = new LinkedList<>();
+    private List<Actividad> actividades_parcial = new LinkedList<>();
     private ArrayDeque<String> grupos_for_spinner = new ArrayDeque<>();
-    private EditText etNombre_Grupo;
+    private EditText etNombre_Grupo, etValor_Parcial;
     private Spinner spGrupos, spAsignaturas;
-    private Button btnEliminar_Alumnos, btnEdit_Criterios, btnSeleccionar_Grupo, btnClosePopup;
-    private ListView lstAlumnos_Inscritos, lstAlumnos_Online;
+    private Button btnSeleccionar_Grupo, btnEliminar_Alumnos, btnEdit_Criterios, btnCerrar_Popup, btnAdd_Actividad;
+    private ListView lstAlumnos_Inscritos, lstAlumnos_Online, lstActividades;
     private Grupo grupo_seleccionado = null;
     private TextView txtAsignaturas;
     private Asignatura asignatura_seleccionada;
     private SMSService sms_service;
     private View popUpView;
+    private Actividades_Adapter mAdapter_Actividades;
+    private Criterio criterio_to_edit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +91,7 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
 
         if (getSupportActionBar() != null) {
             if (getIntent().getStringExtra("SELECCIONADO") != null) {
-                SELECCIONADO = getIntent().getStringExtra("SELECCIONADO");
+                String SELECCIONADO = getIntent().getStringExtra("SELECCIONADO");
                 getSupportActionBar().setTitle(getResources().getString(R.string.barTitle, SELECCIONADO));
             }
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -134,7 +145,10 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
                             spAsignaturas.setVisibility(View.GONE);
                             btnEdit_Criterios.setEnabled(true);
                             btnEliminar_Alumnos.setEnabled(true);
-                            editCriterios();
+                            btnEdit_Criterios.setOnClickListener(e -> {
+                                popUpView.setVisibility(View.VISIBLE);
+                                initDataPopUp();
+                            });
                             grupo_seleccionado = grupos_original.get(spGrupos.getSelectedItemPosition());
                             asignatura_seleccionada = asignaturas_repeated.get(spGrupos.getSelectedItemPosition());
                             loadDataSpinner(grupo_seleccionado);
@@ -245,12 +259,13 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
             asignaturas_original.clear();
 
             grupo_seleccionado.setNombre_grupo(etNombre_Grupo.getText().toString());
+
             if (!alumnos_to_add.isEmpty()) {
                 JsonArray alumnos_original = grupo_seleccionado.getAlumnos();
                 JsonArray alumnos_updated = (JsonArray) new Gson().toJsonTree(alumnos_to_add, new TypeToken<List<Alumno>>() {
                 }.getType());
-                alumnos_original.add(alumnos_updated);
-                grupo_seleccionado.setAlumnos(alumnos_updated);
+                alumnos_original.add(alumnos_updated.get(0));
+                grupo_seleccionado.setAlumnos(alumnos_original);
 
             }
 
@@ -258,12 +273,49 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
                 List<Alumno> alumnos_original = new Gson().fromJson(grupo_seleccionado.getAlumnos(), new TypeToken<List<Alumno>>() {
                 }.getType());
 
-                alumnos_original.removeAll(alumnos_to_remove);
+                for (int i = 0; i < alumnos_original.size(); i++) {
+                    for (int j = 0; j < alumnos_to_remove.size(); j++) {
+                        if (alumnos_original.get(i).getMatricula_alumno().equals(alumnos_to_remove.get(j).getMatricula_alumno())) {
+                            alumnos_original.remove(i);
+                        }
+                    }
+                }
 
                 grupo_seleccionado.setAlumnos((JsonArray) new Gson().toJsonTree(alumnos_original, new TypeToken<List<Alumno>>() {
                 }.getType()));
 
             }
+
+            List<Alumno> alumnos_inscritos = new Gson().fromJson(grupo_seleccionado.getAlumnos(), new TypeToken<List<Alumno>>() {
+            }.getType());
+
+            List<Criterio> criterios_add = new Gson().fromJson(grupo_seleccionado.getCriterios(), new TypeToken<List<Criterio>>() {
+            }.getType());
+
+            List<Calificacion> calificaciones_alumno = new LinkedList<>();
+            if (!alumnos_inscritos.isEmpty()) {
+                //Genero la lista de calificaciones a añadir
+                for (Criterio criterio : criterios_add) {
+                    List<Actividad> actividades_add = new Gson().fromJson(criterio.getActividades(), new TypeToken<List<Actividad>>() {
+                    }.getType());
+                    for (Actividad actividad : actividades_add) {
+                        Calificacion calif = new Calificacion(actividad.getNombre_actividad(), criterio.getParcial(), actividad.getValor(), new JsonArray());
+                        calificaciones_alumno.add(calif);
+                    }
+
+                }
+
+                for (int i = 0; i < alumnos_inscritos.size(); i++) {
+                    alumnos_inscritos.get(i).setCalificaciones((JsonArray) new Gson().toJsonTree(calificaciones_alumno, new TypeToken<List<Calificacion>>() {
+                    }.getType()));
+                }
+
+                grupo_seleccionado.setAlumnos((JsonArray) new Gson().toJsonTree(alumnos_inscritos, new TypeToken<List<Alumno>>() {
+                }.getType()));
+            }
+
+
+            //Actualizo los alumnos inscritos
 
             grupos_asignatura.add(grupo_seleccionado);
 
@@ -299,12 +351,11 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
                 }
 
                 @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
+                public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
                     Toasty.error(Add_Edit_Grupos.this, "Ha ocurrido un error en la request").show();
                     System.out.println("Error en la request " + t.getMessage());
                 }
             });
-
 
         } else {
             Toasty.warning(Add_Edit_Grupos.this, getString(R.string.fields_error)).show();
@@ -323,13 +374,6 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
                     }
                     return Unit.INSTANCE;
                 }).show();
-    }
-
-    private void editCriterios() {
-        btnClosePopup = popUpView.findViewById(R.id.btnClose);
-
-        btnEdit_Criterios.setOnClickListener(v -> popUpView.setVisibility(View.VISIBLE));
-        btnClosePopup.setOnClickListener(v -> popUpView.setVisibility(View.GONE));
     }
 
     private void loadDataSpinner(Grupo grupo_seleccionado) {
@@ -352,7 +396,7 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
             JsonArray alumnos_add = (JsonArray) new Gson().toJsonTree(alumnos_to_add, new TypeToken<List<Alumno>>() {
             }.getType());
             grupo_nuevo.setNombre_grupo(etNombre_Grupo.getText().toString());
-
+            grupo_nuevo.setCriterios(new JsonArray());
             JsonObject grupo = new JsonObject();
             grupo.addProperty("nombre_grupo", etNombre_Grupo.getText().toString());
 
@@ -440,5 +484,163 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
         alumnos_to_add.remove(alumno_seleccionado);
     }
 
+    //SECCION DE CRITERIOS **QUEDÓ :)**
 
+    public void initDataPopUp() {
+        View popupView = findViewById(R.id.popUpView);
+        lstActividades = popupView.findViewById(R.id.lstActividades);
+        btnCerrar_Popup = popupView.findViewById(R.id.btnClose);
+        Button btnGuardar_Criterios = popupView.findViewById(R.id.btnSaveCriterios);
+        btnAdd_Actividad = popupView.findViewById(R.id.btnAddActividad);
+        etValor_Parcial = popupView.findViewById(R.id.etValor_Parcial);
+        RadioGroup rgbParciales = popupView.findViewById(R.id.rbgParciales);
+
+        //Lista de criterios generales --> Arreglo, pero, unicamente contendrá maximo 3 valores (Parcial 1, Parcial 2 y Parcial 3)
+        criterios_grupo_general = new Gson().fromJson(grupo_seleccionado.getCriterios(), new TypeToken<List<Criterio>>() {
+        }.getType());
+
+        rgbParciales.setOnCheckedChangeListener((group, checkedId) -> {
+            //criterio_to_edit = null;
+            if (criterio_to_edit != null) {
+                criterio_to_edit.setActividades((JsonArray) new Gson().toJsonTree(mAdapter_Actividades.getData(), new TypeToken<List<Actividad>>() {
+                }.getType()));
+            }
+
+            switch (checkedId) {
+                case R.id.rbPrimerPar:
+                    //Obtengo el Criterio del primer parcial
+                    PARCIAL_SELECCIONADO = "Primer Parcial";
+                    btnAdd_Actividad.setEnabled(true);
+                    for (Criterio criterio_parcial : criterios_grupo_general) {
+                        if (criterio_parcial.getParcial().equals("Primer Parcial")) {
+                            criterio_to_edit = criterio_parcial;
+                            break;
+                        } else {
+                            criterio_to_edit = null;
+                        }
+                    }
+                    break;
+                case R.id.rbSegundoPar:
+                    //Obtengo el Criterio del segundo parcial
+                    btnAdd_Actividad.setEnabled(true);
+                    PARCIAL_SELECCIONADO = "Segundo Parcial";
+                    for (Criterio criterio_parcial : criterios_grupo_general) {
+                        if (criterio_parcial.getParcial().equals("Segundo Parcial")) {
+                            criterio_to_edit = criterio_parcial;
+                            break;
+                        } else {
+                            criterio_to_edit = null;
+                        }
+                    }
+                    break;
+                case R.id.rbTercerPar:
+                    //Obtengo el Criterio del tercer parcial
+                    PARCIAL_SELECCIONADO = "Tercer Parcial";
+                    btnAdd_Actividad.setEnabled(true);
+                    for (Criterio criterio_parcial : criterios_grupo_general) {
+                        if (criterio_parcial.getParcial().equals("Tercer Parcial")) {
+                            criterio_to_edit = criterio_parcial;
+                            break;
+                        } else {
+                            criterio_to_edit = null;
+                        }
+                    }
+                    break;
+            }
+
+            //Evaluo si existe o no el Parcial para editar
+            if (criterio_to_edit == null) {
+                System.out.println("Inicializando el parcial");
+                Criterio criterio_nuevo = new Criterio(PARCIAL_SELECCIONADO, "0", new JsonArray());
+                criterios_grupo_general.add(criterio_nuevo);
+                criterio_to_edit = criterio_nuevo;
+            }
+
+            loadDataCriterio(criterio_to_edit);
+        });
+
+        btnGuardar_Criterios.setOnClickListener(v -> {
+            //Actualizar los arreglos de Grupo y Asignatura, ademas de añadir los criterios a los alumnos inscritos
+            //Handle los cambios en los campos de texto
+            grupo_seleccionado.setCriterios((JsonArray) new Gson().toJsonTree(criterios_grupo_general, new TypeToken<List<Criterio>>() {
+            }.getType()));
+            btnCerrar_Popup.performClick();
+        });
+
+        btnAdd_Actividad.setOnClickListener(v -> {
+            //Añadir una nueva Actividad el ListView
+
+            actividades_parcial.add(new Actividad("Nueva Actividad", "0", new JsonArray()));
+
+            criterio_to_edit.setActividades((JsonArray) new Gson().toJsonTree(actividades_parcial, new TypeToken<List<Actividad>>() {
+            }.getType()));
+
+            loadDataCriterio(criterio_to_edit);
+
+        });
+
+        //LISTO
+        btnCerrar_Popup.setOnClickListener(v -> {
+            criterios_grupo_general.clear();
+            criterio_to_edit = null;
+            btnAdd_Actividad.setEnabled(false);
+            popupView.setVisibility(View.GONE);
+        });
+
+    }
+
+    private void loadDataCriterio(Criterio criterio_to_edit) {
+        etValor_Parcial.setText(criterio_to_edit.getValor_total());
+
+        actividades_parcial.clear();
+
+        actividades_parcial = new Gson().fromJson(criterio_to_edit.getActividades(), new TypeToken<List<Actividad>>() {
+        }.getType());
+
+        if (!actividades_parcial.isEmpty()) {
+            //Ajusto el layout del List al propio
+            mAdapter_Actividades = new Actividades_Adapter(Add_Edit_Grupos.this, actividades_parcial, Add_Edit_Grupos.this);
+            lstActividades.setAdapter(mAdapter_Actividades);
+        } else {
+            //Muestro un arreglo vacio y espero a que añada una actividad
+            lstActividades.setAdapter(new ArrayAdapter<>(Add_Edit_Grupos.this, android.R.layout.simple_list_item_1, new ArrayList<>()));
+        }
+
+        etValor_Parcial.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!s.toString().trim().isEmpty()) {
+                    criterio_to_edit.setValor_total(s.toString().trim());
+                } else {
+                    Toasty.warning(Add_Edit_Grupos.this, "No puede dejar el campo vacio").show();
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        //Al final se tiene que actualizar "criterios grupo general" y volverlo a poner en el grupo
+    }
+
+    //CREO QUE LISTO
+    @Override
+    public void OnDeleteActividad(Actividad actividad_eliminada) {
+        //Cuando se elimina una actividad del ListView
+        actividades_parcial.remove(actividad_eliminada);
+
+        criterio_to_edit.setActividades((JsonArray) new Gson().toJsonTree(actividades_parcial, new TypeToken<List<Actividad>>() {
+        }.getType()));
+
+        loadDataCriterio(criterio_to_edit);
+
+    }
 }

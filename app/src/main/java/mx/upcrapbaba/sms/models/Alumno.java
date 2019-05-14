@@ -1,6 +1,8 @@
 package mx.upcrapbaba.sms.models;
 
+import com.google.gson.JsonArray;
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 public class Alumno {
 
@@ -12,18 +14,18 @@ public class Alumno {
     private String apellidos;
     @Expose
     private String imagen_alumno;
-    @Expose
-    private String[] calificaciones;
+    @SerializedName("calificaciones")
+    private JsonArray calificaciones;
 
-    public Alumno() {
-    }
-
-    public Alumno(String matricula_alumno, String nombre_alumno, String apellidos, String imagen_alumno, String[] calificaciones) {
+    public Alumno(String matricula_alumno, String nombre_alumno, String apellidos, String imagen_alumno, JsonArray calificaciones) {
         this.matricula_alumno = matricula_alumno;
         this.nombre_alumno = nombre_alumno;
         this.apellidos = apellidos;
         this.imagen_alumno = imagen_alumno;
         this.calificaciones = calificaciones;
+    }
+
+    public Alumno() {
     }
 
     public String getMatricula_alumno() {
@@ -58,25 +60,11 @@ public class Alumno {
         this.imagen_alumno = imagen_alumno;
     }
 
-    public String[] getCalificaciones() {
+    public JsonArray getCalificaciones() {
         return calificaciones;
     }
 
-    public void setCalificaciones(String[] calificaciones) {
+    public void setCalificaciones(JsonArray calificaciones) {
         this.calificaciones = calificaciones;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Alumno) {
-            return ((Alumno) obj).matricula_alumno.equals(matricula_alumno);
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.parseInt(this.matricula_alumno);
-    }
-
 }

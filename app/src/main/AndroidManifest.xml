@@ -15,26 +15,31 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
+
         <activity
             android:name=".views.personalizacion.Add_Edit_Alumnos"
+            android:windowSoftInputMode="adjustPan|adjustResize"
             android:parentActivityName=".views.inicio.Inicio" />
+
         <activity
             android:name=".views.personalizacion.Add_Edit_Grupos"
-            android:label="@string/title_activity_add__edit__grupos"
             android:parentActivityName=".views.inicio.Inicio"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="mx.upcrapbaba.sms.views.inicio.Inicio" />
-        </activity>
+            android:windowSoftInputMode="adjustPan|adjustResize" />
+
         <activity
             android:name=".views.personalizacion.Add_Edit_Asignaturas"
             android:parentActivityName=".views.inicio.Inicio"
             android:windowSoftInputMode="adjustPan|adjustResize" />
+
         <activity
             android:name=".views.user_settings.User_Profile"
-            android:parentActivityName=".views.inicio.Inicio" />
-        <activity android:name=".views.inicio.Inicio" />
+            android:parentActivityName=".views.inicio.Inicio"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
+
+        <activity
+            android:name=".views.inicio.Inicio"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
+
         <activity
             android:name=".views.splash.SplashScreen"
             android:theme="@style/SplashTheme">
@@ -44,16 +49,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".views.sesion.Register"
-            android:parentActivityName=".views.sesion.Login" />
-        <activity android:name=".views.sesion.Login" />
+            android:parentActivityName=".views.sesion.Login"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
+
+        <activity
+            android:name=".views.sesion.Login"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
+
         <activity
             android:name=".views.inicio.Information"
             android:parentActivityName=".views.inicio.Inicio" />
+
         <activity
             android:name=".views.inicio.Estadisticas"
-            android:parentActivityName=".views.inicio.Inicio" />
+            android:parentActivityName=".views.inicio.Inicio"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
+
     </application>
 
 </manifest>

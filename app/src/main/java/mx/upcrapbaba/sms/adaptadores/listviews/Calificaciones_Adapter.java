@@ -5,27 +5,29 @@ import android.database.DataSetObserver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ListAdapter;
+import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import mx.upcrapbaba.sms.R;
-import mx.upcrapbaba.sms.models.Grupo;
+import mx.upcrapbaba.sms.models.Calificacion;
 
-public class Grupos_Edit_Adapter implements ListAdapter {
-
+public class Calificaciones_Adapter implements ListAdapter {
     private Context mContext;
-    private List<Grupo> dataSet;
-    private List<String> nombres_asignatura;
-    private Grupos_Edit_Adapter.GroupListener setOnItemGroupSelected;
+    private List<Calificacion> dataSet;
+    private Calificaciones_Adapter.ItemSelected setOnDataChanged;
 
-
-    public Grupos_Edit_Adapter(Context mContext, List<Grupo> dataSet, List<String> nombres_asignatura, GroupListener setOnItemGroupSelected) {
+    public Calificaciones_Adapter(Context mContext, List<Calificacion> dataSet, Calificaciones_Adapter.ItemSelected setOnDataChanged) {
         this.mContext = mContext;
         this.dataSet = dataSet;
-        this.nombres_asignatura = nombres_asignatura;
-        this.setOnItemGroupSelected = setOnItemGroupSelected;
+        this.setOnDataChanged = setOnDataChanged;
     }
 
     @Override
@@ -70,21 +72,22 @@ public class Grupos_Edit_Adapter implements ListAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Grupo grupo_actual = dataSet.get(position);
+        Calificacion calificacion_actual = dataSet.get(position);
         if (convertView == null) {
             LayoutInflater layoutInflater = LayoutInflater.from(mContext);
-            convertView = layoutInflater.inflate(R.layout.grupos_list_content, null);
+            convertView = layoutInflater.inflate(R.layout.calificaciones_content, null);
+            TextView lblNombre_Actividad = convertView.findViewById(R.id.lblNombre_Actividad);
+            EditText etCalificacion = convertView.findViewById(R.id.etCalificacion);
 
-            CheckBox cboGrupo = convertView.findViewById(R.id.cboGrupo);
+            lblNombre_Actividad.setText(calificacion_actual.getNombre_actividad());
+            String[] calificaciones_array = new Gson().fromJson(calificacion_actual.getCalificacion_obtenida(), new TypeToken<String[]>() {
+            }.getType());
 
-            cboGrupo.setText(String.format("%s - %s", grupo_actual.getNombre_grupo(), nombres_asignatura.get(position)));
-            cboGrupo.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    setOnItemGroupSelected.OnItemGroupSelected(grupo_actual, nombres_asignatura.get(position));
-                } else {
-                    setOnItemGroupSelected.OnItemGroupDeselected(grupo_actual, nombres_asignatura.get(position));
-                }
-            });
+            List<String> calificaciones_refinada = new LinkedList<>(Arrays.asList(calificaciones_array));
+
+            if (!calificaciones_refinada.isEmpty()) {
+                etCalificacion.setText(calificaciones_refinada.toString());
+            }
 
         }
 
@@ -106,10 +109,7 @@ public class Grupos_Edit_Adapter implements ListAdapter {
         return false;
     }
 
-    public interface GroupListener {
-        void OnItemGroupSelected(Grupo grupo_seleccionado, String grupo_asignatura);
-
-        void OnItemGroupDeselected(Grupo grupo_seleccionado, String grupo_asignatura);
+    public interface ItemSelected {
+        void onDataChanged(Calificacion calificacion);
     }
-
 }

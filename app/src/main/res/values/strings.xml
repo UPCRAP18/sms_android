@@ -123,5 +123,20 @@
 
     <!-- Estadisticas -->
     <string name="title_activity_Estadisticas">Estadisticas</string>
+    <string name="btnCerrar">Cerrar</string>
+    <string name="txtParcial_Editar">Parcial a editar:</string>
+    <string name="rbPrimerParcial">Primer Parcial</string>
+    <string name="rbSegundo_Parcial">Segundo Parcial</string>
+    <string name="rbTercerParcial">Tercer Parcial</string>
+    <string name="lblActividades_Criterios">Actividades:</string>
+
+    <!-- Editar Criterios -->
+    <string name="btnAdd_Actividad">Añadir \nactividad</string>
+    <string name="btnActividad">Actividad: %s</string>
+    <string name="lblNombreActividad">Actividad:</string>
+    <string name="lblValorActividad">Valor:</string>
+    <string name="ht_Nombre_Actividad">Nombre de la actividad</string>
+    <string name="ht_Valor_Actividad">Valor de la actividad</string>
+    <string name="lblNombre_Actividad">%s</string>
 
 </resources>

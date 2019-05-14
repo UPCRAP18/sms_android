@@ -79,6 +79,9 @@ public class Estadisticas extends AppCompatActivity implements BottomNavigation.
                 this.finish();
                 break;
             case 2:
+                startActivity(new Intent(Estadisticas.this, Information.class));
+                overridePendingTransition(R.anim.left_in, R.anim.left_out);
+                this.finish();
                 break;
         }
     }

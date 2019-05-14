@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -41,6 +42,7 @@ import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
 import kotlin.Unit;
 import mx.upcrapbaba.sms.R;
 import mx.upcrapbaba.sms.adaptadores.listviews.Alumnos_GeneralList_Adapter;
+import mx.upcrapbaba.sms.adaptadores.listviews.Calificaciones_Adapter;
 import mx.upcrapbaba.sms.adaptadores.spinners.Asignaturas_General_Adapter;
 import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.api.Service.SMSService;
@@ -48,6 +50,7 @@ import mx.upcrapbaba.sms.extras.Alert_Dialog;
 import mx.upcrapbaba.sms.extras.NetworkStatus;
 import mx.upcrapbaba.sms.models.Alumno;
 import mx.upcrapbaba.sms.models.Asignatura;
+import mx.upcrapbaba.sms.models.Calificacion;
 import mx.upcrapbaba.sms.models.Grupo;
 import mx.upcrapbaba.sms.models.User;
 import mx.upcrapbaba.sms.sqlite.DBHelper;
@@ -59,7 +62,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenuItemSelectionListener, Alumnos_GeneralList_Adapter.FilterStudentsAdapterListener {
+public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenuItemSelectionListener, Alumnos_GeneralList_Adapter.FilterStudentsAdapterListener, Calificaciones_Adapter.ItemSelected {
 
     private AVLoadingIndicatorView pbar;
     private String token, id_usuario;
@@ -76,7 +79,9 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
     private int RESULT_POPUP = 0;
     private LinearLayout layAlumnos;
     private Alumnos_GeneralList_Adapter alumnos_adapter;
+    private Calificaciones_Adapter calificaciones_adapter;
     private MaterialSearchBar mSearchBar;
+    private View popupCalificaciones;
 
     /**
      * Comprueba el estado de la red del telefono
@@ -135,6 +140,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         txtError_Message = findViewById(R.id.txtError_Message);
         layAlumnos = findViewById(R.id.layAlumnos);
         mSearchBar = findViewById(R.id.searchBarAlumnos);
+        popupCalificaciones = findViewById(R.id.popupCalificaciones);
 
         FloatingActionButton fab_Add_Alumno = findViewById(R.id.fabAddAlumno);
         FloatingActionButton fab_Add_Asignatura = findViewById(R.id.fabAddAsignatura);
@@ -174,9 +180,15 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Alumnos_GeneralList_Adapter filterResults =
-                        new Alumnos_GeneralList_Adapter(alumnos_adapter.getfilterData(s.toString()), Inicio.this, Inicio.this);
-                lstAlumnos.setAdapter(filterResults);
+                List<Alumno> filteredList = alumnos_adapter.getfilterData(s.toString());
+                if (filteredList.size() >= 1) {
+                    Alumnos_GeneralList_Adapter filterResults =
+                            new Alumnos_GeneralList_Adapter(filteredList, Inicio.this, Inicio.this);
+                    lstAlumnos.setAdapter(filterResults);
+                } else {
+                    lstAlumnos.setAdapter(new ArrayAdapter<>(Inicio.this, android.R.layout.simple_list_item_1, new ArrayList<>()));
+                }
+
             }
 
             @Override
@@ -404,7 +416,33 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
 
     @Override
     public void onStudentSelected(Alumno alumno_seleccionado) {
+
+        List<Calificacion> calificaciones = new Gson().fromJson(alumno_seleccionado.getCalificaciones(), new TypeToken<List<Calificacion>>() {
+        }.getType());
+
+        if (!calificaciones.isEmpty()) {
+            popupCalificaciones.setVisibility(View.VISIBLE);
+            Button btnClose_Calif = popupCalificaciones.findViewById(R.id.btnClose_Calificaciones);
+            ListView lstCalificaciones = popupCalificaciones.findViewById(R.id.lstCalificaciones);
+            Button btnSave = popupCalificaciones.findViewById(R.id.btnSave_Calificaciones);
+
+            calificaciones_adapter = new Calificaciones_Adapter(Inicio.this, calificaciones, Inicio.this);
+
+            lstCalificaciones.setAdapter(calificaciones_adapter);
+
+
+            btnClose_Calif.setOnClickListener(v -> {
+                popupCalificaciones.setVisibility(View.GONE);
+            });
+
+        }
+
         Toasty.info(Inicio.this, alumno_seleccionado.getMatricula_alumno()).show();
+    }
+
+    @Override
+    public void onDataChanged(Calificacion calificacion) {
+
     }
 }
 
