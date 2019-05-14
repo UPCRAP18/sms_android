@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -37,7 +38,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import es.dmoral.toasty.Toasty;
 import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
 import kotlin.Unit;
 import mx.upcrapbaba.sms.R;
@@ -62,7 +62,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenuItemSelectionListener, Alumnos_GeneralList_Adapter.FilterStudentsAdapterListener, Calificaciones_Adapter.ItemSelected {
+public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenuItemSelectionListener, Alumnos_GeneralList_Adapter.FilterStudentsAdapterListener {
 
     private AVLoadingIndicatorView pbar;
     private String token, id_usuario;
@@ -171,7 +171,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
             Alert_Dialog.showErrorMessage(this);
         }
 
-
+        //TODO Checar esto
         mSearchBar.addTextChangeListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -180,15 +180,16 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                List<Alumno> filteredList = alumnos_adapter.getfilterData(s.toString());
-                if (filteredList.size() >= 1) {
-                    Alumnos_GeneralList_Adapter filterResults =
-                            new Alumnos_GeneralList_Adapter(filteredList, Inicio.this, Inicio.this);
-                    lstAlumnos.setAdapter(filterResults);
-                } else {
-                    lstAlumnos.setAdapter(new ArrayAdapter<>(Inicio.this, android.R.layout.simple_list_item_1, new ArrayList<>()));
+                if (s != null) {
+                    List<Alumno> filteredList = alumnos_adapter.getfilterData(s.toString());
+                    if (filteredList.size() >= 1) {
+                        Alumnos_GeneralList_Adapter filterResults =
+                                new Alumnos_GeneralList_Adapter(filteredList, Inicio.this, Inicio.this);
+                        lstAlumnos.setAdapter(filterResults);
+                    } else {
+                        lstAlumnos.setAdapter(new ArrayAdapter<>(Inicio.this, android.R.layout.simple_list_item_1, new ArrayList<>()));
+                    }
                 }
-
             }
 
             @Override
@@ -416,33 +417,59 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
 
     @Override
     public void onStudentSelected(Alumno alumno_seleccionado) {
-
+        Button btnClose_Calif = popupCalificaciones.findViewById(R.id.btnClose_Calificaciones);
+        ListView lstCalificaciones = popupCalificaciones.findViewById(R.id.lstCalificaciones);
+        Button btnSave = popupCalificaciones.findViewById(R.id.btnSave_Calificaciones);
+        RadioGroup rgParciales = popupCalificaciones.findViewById(R.id.rgParciales);
         List<Calificacion> calificaciones = new Gson().fromJson(alumno_seleccionado.getCalificaciones(), new TypeToken<List<Calificacion>>() {
         }.getType());
+        List<Calificacion> calificacion_refinada = new LinkedList<>();
 
-        if (!calificaciones.isEmpty()) {
-            popupCalificaciones.setVisibility(View.VISIBLE);
-            Button btnClose_Calif = popupCalificaciones.findViewById(R.id.btnClose_Calificaciones);
-            ListView lstCalificaciones = popupCalificaciones.findViewById(R.id.lstCalificaciones);
-            Button btnSave = popupCalificaciones.findViewById(R.id.btnSave_Calificaciones);
+        rgParciales.setOnCheckedChangeListener((group, checkedId) -> {
+            switch (group.getCheckedRadioButtonId()) {
+                case R.id.rbPrimer:
+                    calificacion_refinada.clear();
+                    for (Calificacion calificacion : calificaciones) {
+                        if (calificacion.getParcial().equals("Primer Parcial")) {
+                            calificacion_refinada.add(calificacion);
+                        }
+                    }
+                    break;
+                case R.id.rbSegundo:
+                    calificacion_refinada.clear();
+                    for (Calificacion calificacion : calificaciones) {
+                        if (calificacion.getParcial().equals("Segundo Parcial")) {
+                            calificacion_refinada.add(calificacion);
+                        }
+                    }
+                    break;
+                case R.id.rbTercer:
+                    calificacion_refinada.clear();
+                    for (Calificacion calificacion : calificaciones) {
+                        if (calificacion.getParcial().equals("Tercer Parcial")) {
+                            calificacion_refinada.add(calificacion);
+                        }
+                    }
+                    break;
+            }
 
-            calificaciones_adapter = new Calificaciones_Adapter(Inicio.this, calificaciones, Inicio.this);
+            if (!calificacion_refinada.isEmpty()) {
 
-            lstCalificaciones.setAdapter(calificaciones_adapter);
+                calificaciones_adapter = new Calificaciones_Adapter(Inicio.this, calificacion_refinada);
+
+                lstCalificaciones.setAdapter(calificaciones_adapter);
+
+            }
+        });
+
+        popupCalificaciones.setVisibility(View.VISIBLE);
 
 
-            btnClose_Calif.setOnClickListener(v -> {
-                popupCalificaciones.setVisibility(View.GONE);
-            });
+        btnClose_Calif.setOnClickListener(v -> {
+            popupCalificaciones.setVisibility(View.GONE);
+        });
 
-        }
-
-        Toasty.info(Inicio.this, alumno_seleccionado.getMatricula_alumno()).show();
     }
 
-    @Override
-    public void onDataChanged(Calificacion calificacion) {
-
-    }
 }
 

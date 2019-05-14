@@ -6,6 +6,61 @@
     android:gravity="center"
     android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/lblParcial"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/lblParcial"
+        android:textAlignment="center"
+        android:textColor="@color/indigo_material"
+        android:textSize="22sp" />
+
+    <RadioGroup
+        android:id="@+id/rgParciales"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:checkedButton="@id/rbPrimer"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rbPrimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:layout_weight="1"
+            android:buttonTint="#FF5722"
+            android:text="@string/rbPrimerParcial"
+            android:textAlignment="textStart"
+            android:textColor="@color/indigo_material"
+            android:textSize="16sp" />
+
+        <RadioButton
+            android:id="@+id/rbSegundo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:layout_weight="1"
+            android:buttonTint="#FF5722"
+            android:text="@string/rbSegundo_Parcial"
+            android:textAlignment="textStart"
+            android:textColor="@color/indigo_material"
+            android:textSize="16sp" />
+
+        <RadioButton
+            android:id="@+id/rbTercer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:layout_weight="1"
+            android:buttonTint="#FF5722"
+            android:text="@string/rbTercerParcial"
+            android:textAlignment="textStart"
+            android:textColor="@color/indigo_material"
+            android:textSize="16sp" />
+    </RadioGroup>
+
     <ListView
         android:id="@+id/lstCalificaciones"
         android:layout_width="match_parent"

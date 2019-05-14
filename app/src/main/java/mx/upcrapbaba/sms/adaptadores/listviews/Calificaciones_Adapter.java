@@ -9,11 +9,6 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import mx.upcrapbaba.sms.R;
@@ -22,12 +17,10 @@ import mx.upcrapbaba.sms.models.Calificacion;
 public class Calificaciones_Adapter implements ListAdapter {
     private Context mContext;
     private List<Calificacion> dataSet;
-    private Calificaciones_Adapter.ItemSelected setOnDataChanged;
 
-    public Calificaciones_Adapter(Context mContext, List<Calificacion> dataSet, Calificaciones_Adapter.ItemSelected setOnDataChanged) {
+    public Calificaciones_Adapter(Context mContext, List<Calificacion> dataSet) {
         this.mContext = mContext;
         this.dataSet = dataSet;
-        this.setOnDataChanged = setOnDataChanged;
     }
 
     @Override
@@ -80,14 +73,14 @@ public class Calificaciones_Adapter implements ListAdapter {
             EditText etCalificacion = convertView.findViewById(R.id.etCalificacion);
 
             lblNombre_Actividad.setText(calificacion_actual.getNombre_actividad());
-            String[] calificaciones_array = new Gson().fromJson(calificacion_actual.getCalificacion_obtenida(), new TypeToken<String[]>() {
+            /*String[] calificaciones_array = new Gson().fromJson(calificacion_actual.getCalificacion_obtenida(), new TypeToken<String[]>() {
             }.getType());
 
             List<String> calificaciones_refinada = new LinkedList<>(Arrays.asList(calificaciones_array));
 
             if (!calificaciones_refinada.isEmpty()) {
                 etCalificacion.setText(calificaciones_refinada.toString());
-            }
+            }*/
 
         }
 
@@ -109,7 +102,8 @@ public class Calificaciones_Adapter implements ListAdapter {
         return false;
     }
 
-    public interface ItemSelected {
-        void onDataChanged(Calificacion calificacion);
+    public List<Calificacion> getDataSet() {
+        return dataSet;
     }
+
 }

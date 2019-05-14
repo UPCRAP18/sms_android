@@ -7,11 +7,13 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.Spinner;
 
 import java.util.List;
 
@@ -25,12 +27,11 @@ public class Actividades_Adapter implements ListAdapter {
     private Actividades_Adapter.ItemSelected setOnItemSelected;
 
 
-    public Actividades_Adapter(Context mContext, List<Actividad> dataSet, ItemSelected itemListener) {
+    public Actividades_Adapter(Context mContext, List<Actividad> dataSet, ItemSelected setOnItemSelected) {
         this.mContext = mContext;
         this.dataSet = dataSet;
-        this.setOnItemSelected = itemListener;
+        this.setOnItemSelected = setOnItemSelected;
     }
-
 
     @Override
     public boolean areAllItemsEnabled() {
@@ -82,17 +83,41 @@ public class Actividades_Adapter implements ListAdapter {
             LinearLayout layActividad = convertView.findViewById(R.id.layActivity_Info);
             EditText etNombre_Actividad = convertView.findViewById(R.id.etNombre_Actividad);
             EditText etValor_Actividad = convertView.findViewById(R.id.etValor_Actividad);
+            Spinner spParcial = convertView.findViewById(R.id.spParcial);
             ImageButton deleteActividad = convertView.findViewById(R.id.imgbDelete);
 
             btnActividad.setText(mContext.getResources().getString(R.string.btnActividad, actividad_actual.getNombre_actividad()));
             etNombre_Actividad.setText(actividad_actual.getNombre_actividad());
-            etValor_Actividad.setText(actividad_actual.getValor());
+            etValor_Actividad.setText(actividad_actual.getValor_actividad());
 
             btnActividad.setOnClickListener(v -> {
                 if (layActividad.getVisibility() == View.VISIBLE) {
                     layActividad.setVisibility(View.GONE);
                 } else {
                     layActividad.setVisibility(View.VISIBLE);
+                }
+            });
+
+            spParcial.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    switch (position) {
+                        case 0:
+                            actividad_actual.setParcial("Primer Parcial");
+                            break;
+                        case 1:
+                            actividad_actual.setParcial("Segundo Parcial");
+                            break;
+                        case 2:
+                            actividad_actual.setParcial("Tercer Parcial");
+                            break;
+
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
                 }
             });
 
@@ -126,7 +151,7 @@ public class Actividades_Adapter implements ListAdapter {
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     if (!s.toString().trim().isEmpty()) {
-                        actividad_actual.setValor(s.toString().trim());
+                        actividad_actual.setValor_actividad(s.toString().trim());
                     } else {
                         Toasty.warning(mContext, "Por favor, no deje este campo vacio").show();
                     }
@@ -138,7 +163,7 @@ public class Actividades_Adapter implements ListAdapter {
                 }
             });
 
-            deleteActividad.setOnClickListener(v -> setOnItemSelected.OnDeleteActividad(actividad_actual));
+            deleteActividad.setOnClickListener(v -> setOnItemSelected.onDeleteActividad(actividad_actual));
 
         }
 
@@ -165,6 +190,6 @@ public class Actividades_Adapter implements ListAdapter {
     }
 
     public interface ItemSelected {
-        void OnDeleteActividad(Actividad actividad_eliminada);
+        void onDeleteActividad(Actividad actividad_eliminada);
     }
 }

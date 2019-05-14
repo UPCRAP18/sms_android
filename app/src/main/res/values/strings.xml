@@ -137,6 +137,14 @@
     <string name="lblValorActividad">Valor:</string>
     <string name="ht_Nombre_Actividad">Nombre de la actividad</string>
     <string name="ht_Valor_Actividad">Valor de la actividad</string>
+    <string-array name="parciales">
+        <item>Primer Parcial</item>
+        <item>Segundo Parcial</item>
+        <item>Tercer Parcial</item>
+    </string-array>
+
+
     <string name="lblNombre_Actividad">%s</string>
+    <string name="lblParcial">Parcial:</string>
 
 </resources>

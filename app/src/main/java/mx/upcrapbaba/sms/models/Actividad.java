@@ -1,23 +1,19 @@
 package mx.upcrapbaba.sms.models;
 
-import com.google.gson.JsonArray;
 import com.google.gson.annotations.Expose;
 
 public class Actividad {
     @Expose
     private String nombre_actividad;
     @Expose
-    private String valor;
+    private String valor_actividad;
     @Expose
-    private JsonArray obtenido;
+    private String parcial;
 
-    public Actividad() {
-    }
-
-    public Actividad(String nombre_actividad, String valor, JsonArray obtenido) {
+    public Actividad(String nombre_actividad, String valor_actividad, String parcial) {
         this.nombre_actividad = nombre_actividad;
-        this.valor = valor;
-        this.obtenido = obtenido;
+        this.valor_actividad = valor_actividad;
+        this.parcial = parcial;
     }
 
     public String getNombre_actividad() {
@@ -28,19 +24,20 @@ public class Actividad {
         this.nombre_actividad = nombre_actividad;
     }
 
-    public String getValor() {
-        return valor;
+    public String getValor_actividad() {
+        return valor_actividad;
     }
 
-    public void setValor(String valor) {
-        this.valor = valor;
+    public void setValor_actividad(String valor_actividad) {
+        this.valor_actividad = valor_actividad;
     }
 
-    public JsonArray getObtenido() {
-        return obtenido;
+    public String getParcial() {
+        return parcial;
     }
 
-    public void setObtenido(JsonArray obtenido) {
-        this.obtenido = obtenido;
+    public void setParcial(String parcial) {
+        this.parcial = parcial;
     }
 }
+

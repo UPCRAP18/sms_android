@@ -249,7 +249,7 @@
     </LinearLayout>
 
     <include
-        android:id="@+id/popUpView"
+        android:id="@+id/popUpActividades"
         layout="@layout/content_popup_criterios"
         android:layout_width="0dp"
         android:layout_height="0dp"
