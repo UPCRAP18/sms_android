@@ -295,7 +295,7 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
             if (!alumnos_inscritos.isEmpty()) {
                 //Genero la lista de calificaciones a añadir
                 for (Actividad actividad : actividades_add) {
-                    Calificacion calif = new Calificacion(actividad.getNombre_actividad(), actividad.getParcial(), actividad.getValor_actividad(), new JsonArray());
+                    Calificacion calif = new Calificacion(actividad.getNombre_actividad(), actividad.getParcial(), actividad.getValor_actividad(), "0");
                     calificaciones_alumno.add(calif);
                 }
 
@@ -511,6 +511,7 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
             List<Actividad> actividades_update = mActividades_Adapter.getData();
             grupo_seleccionado.setCriterios((JsonArray) new Gson().toJsonTree(actividades_update, new TypeToken<List<Actividad>>() {
             }.getType()));
+            Toasty.success(Add_Edit_Grupos.this, "Se han guardado los datos").show();
             initDataPopUp();
         });
 

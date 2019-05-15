@@ -98,6 +98,18 @@ public class Actividades_Adapter implements ListAdapter {
                 }
             });
 
+            switch (actividad_actual.getParcial()) {
+                case "Primer Parcial":
+                    spParcial.setSelection(0);
+                    break;
+                case "Segundo Parcial":
+                    spParcial.setSelection(1);
+                    break;
+                case "Tercer Parcial":
+                    spParcial.setSelection(2);
+                    break;
+            }
+
             spParcial.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

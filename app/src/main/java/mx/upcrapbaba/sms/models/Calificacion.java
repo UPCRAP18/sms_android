@@ -1,8 +1,6 @@
 package mx.upcrapbaba.sms.models;
 
-import com.google.gson.JsonArray;
 import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 
 public class Calificacion {
     @Expose
@@ -11,10 +9,10 @@ public class Calificacion {
     private String parcial;
     @Expose
     private String valor_actividad;
-    @SerializedName("obtenido")
-    private JsonArray obtenido;
+    @Expose
+    private String obtenido;
 
-    public Calificacion(String nombre_actividad, String parcial, String valor_actividad, JsonArray obtenido) {
+    public Calificacion(String nombre_actividad, String parcial, String valor_actividad, String obtenido) {
         this.nombre_actividad = nombre_actividad;
         this.parcial = parcial;
         this.valor_actividad = valor_actividad;
@@ -45,11 +43,11 @@ public class Calificacion {
         this.valor_actividad = valor_actividad;
     }
 
-    public JsonArray getObtenido() {
+    public String getObtenido() {
         return obtenido;
     }
 
-    public void setObtenido(JsonArray obtenido) {
+    public void setObtenido(String obtenido) {
         this.obtenido = obtenido;
     }
 }

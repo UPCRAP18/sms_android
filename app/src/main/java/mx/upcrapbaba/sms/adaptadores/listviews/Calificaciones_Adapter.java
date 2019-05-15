@@ -5,8 +5,9 @@ import android.database.DataSetObserver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.List;
@@ -70,17 +71,33 @@ public class Calificaciones_Adapter implements ListAdapter {
             LayoutInflater layoutInflater = LayoutInflater.from(mContext);
             convertView = layoutInflater.inflate(R.layout.calificaciones_content, null);
             TextView lblNombre_Actividad = convertView.findViewById(R.id.lblNombre_Actividad);
-            EditText etCalificacion = convertView.findViewById(R.id.etCalificacion);
+            Spinner spCalificacion = convertView.findViewById(R.id.spCalificacion);
 
             lblNombre_Actividad.setText(calificacion_actual.getNombre_actividad());
-            /*String[] calificaciones_array = new Gson().fromJson(calificacion_actual.getCalificacion_obtenida(), new TypeToken<String[]>() {
-            }.getType());
 
-            List<String> calificaciones_refinada = new LinkedList<>(Arrays.asList(calificaciones_array));
+            String[] calificaciones = mContext.getResources().getStringArray(R.array.calificaciones);
 
-            if (!calificaciones_refinada.isEmpty()) {
-                etCalificacion.setText(calificaciones_refinada.toString());
-            }*/
+            for (int i = 0; i < calificaciones.length; i++) {
+                if (calificacion_actual.getObtenido().equals(calificaciones[i])) {
+                    spCalificacion.setSelection(i);
+                    break;
+                } else {
+                    spCalificacion.setSelection(0);
+                }
+            }
+
+            spCalificacion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    calificacion_actual.setObtenido(calificaciones[position]);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+
 
         }
 

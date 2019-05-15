@@ -16,12 +16,14 @@
         android:textColor="@color/indigo_material"
         android:textSize="20sp" />
 
-    <EditText
-        android:id="@+id/etCalificacion"
+    <Spinner
+        android:id="@+id/spCalificacion"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="38dp"
         android:layout_marginStart="12dp"
-        android:layout_weight="3"
+        android:layout_weight="1"
+        android:entries="@array/calificaciones"
+        android:textAlignment="center"
         android:textSize="18sp" />
 
 </LinearLayout>

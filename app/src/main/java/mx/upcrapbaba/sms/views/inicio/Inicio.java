@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -28,6 +29,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -37,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
 import kotlin.Unit;
@@ -82,6 +86,9 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
     private Calificaciones_Adapter calificaciones_adapter;
     private MaterialSearchBar mSearchBar;
     private View popupCalificaciones;
+    private Asignatura asignatura_seleccionada;
+    private Grupo grupo_seleccionado;
+    private SMSService sms_service;
 
     /**
      * Comprueba el estado de la red del telefono
@@ -117,7 +124,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
     private void loadDataContent() {
         setContentView(R.layout.activity_inicio);
 
-        SMSService sms_service = ApiWeb.getApi(new ApiWeb().getBASE_URL_GLITCH()).create(SMSService.class);
+        sms_service = ApiWeb.getApi(new ApiWeb().getBASE_URL_GLITCH()).create(SMSService.class);
         token = "Bearer " + new DBHelper(this).getData_Usuario().get(1);
         id_usuario = new DBHelper(this).getData_Usuario().get(0);
 
@@ -171,7 +178,6 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
             Alert_Dialog.showErrorMessage(this);
         }
 
-        //TODO Checar esto
         mSearchBar.addTextChangeListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -180,7 +186,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s != null) {
+                if (mSearchBar != null) {
                     List<Alumno> filteredList = alumnos_adapter.getfilterData(s.toString());
                     if (filteredList.size() >= 1) {
                         Alumnos_GeneralList_Adapter filterResults =
@@ -189,6 +195,8 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
                     } else {
                         lstAlumnos.setAdapter(new ArrayAdapter<>(Inicio.this, android.R.layout.simple_list_item_1, new ArrayList<>()));
                     }
+                } else {
+                    Inicio.this.recreate();
                 }
             }
 
@@ -311,7 +319,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         spAsignaturas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Asignatura asignatura_seleccionada = asignaturas.get(position);
+                asignatura_seleccionada = asignaturas.get(position);
                 grupos = new Gson().fromJson(asignatura_seleccionada.getGrupos(), new TypeToken<List<Grupo>>() {
                 }.getType());
                 nombre_grupos.clear();
@@ -355,7 +363,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         spGrupos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Grupo grupo_seleccionado = grupos.get(position);
+                grupo_seleccionado = grupos.get(position);
 
                 alumnos = new Gson().fromJson(grupo_seleccionado.getAlumnos(), new TypeToken<List<Alumno>>() {
                 }.getType());
@@ -421,9 +429,17 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         ListView lstCalificaciones = popupCalificaciones.findViewById(R.id.lstCalificaciones);
         Button btnSave = popupCalificaciones.findViewById(R.id.btnSave_Calificaciones);
         RadioGroup rgParciales = popupCalificaciones.findViewById(R.id.rgParciales);
+        RadioButton rbPrimer = popupCalificaciones.findViewById(R.id.rbPrimer);
+        RadioButton rbSegundo = popupCalificaciones.findViewById(R.id.rbSegundo);
+        RadioButton rbTercer = popupCalificaciones.findViewById(R.id.rbTercer);
+        TextView txtPromedio_Parcial = popupCalificaciones.findViewById(R.id.txtPromedioParcial);
+        TextView txtPromedio_General = popupCalificaciones.findViewById(R.id.txtPromedioGeneral);
         List<Calificacion> calificaciones = new Gson().fromJson(alumno_seleccionado.getCalificaciones(), new TypeToken<List<Calificacion>>() {
         }.getType());
         List<Calificacion> calificacion_refinada = new LinkedList<>();
+
+        AtomicInteger promedio_parcial = new AtomicInteger();
+        int promedio_general = 0;
 
         rgParciales.setOnCheckedChangeListener((group, checkedId) -> {
             switch (group.getCheckedRadioButtonId()) {
@@ -432,6 +448,11 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
                     for (Calificacion calificacion : calificaciones) {
                         if (calificacion.getParcial().equals("Primer Parcial")) {
                             calificacion_refinada.add(calificacion);
+                            if (!calificacion.getObtenido().equals("NP")) {
+                                promedio_parcial.addAndGet((Integer.parseInt(calificacion.getObtenido()) * Integer.parseInt(calificacion.getValor_actividad())) / 100);
+                            } else {
+
+                            }
                         }
                     }
                     break;
@@ -455,18 +476,86 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
 
             if (!calificacion_refinada.isEmpty()) {
 
+                txtPromedio_General.setVisibility(View.VISIBLE);
+                txtPromedio_Parcial.setVisibility(View.VISIBLE);
+
+                txtPromedio_Parcial.setText(getResources().getString(R.string.lblPromParc, promedio_parcial));
+
                 calificaciones_adapter = new Calificaciones_Adapter(Inicio.this, calificacion_refinada);
 
                 lstCalificaciones.setAdapter(calificaciones_adapter);
 
+            } else {
+                lstCalificaciones.setAdapter(new ArrayAdapter<>(Inicio.this, android.R.layout.simple_list_item_1, new ArrayList<>()));
+                txtPromedio_General.setVisibility(View.GONE);
+                txtPromedio_Parcial.setVisibility(View.GONE);
             }
         });
 
         popupCalificaciones.setVisibility(View.VISIBLE);
 
+        btnSave.setOnClickListener(v -> {
+            int index = alumnos.indexOf(alumno_seleccionado);
+            //actualizacion de alumnos
+            alumnos.remove(index);
+            alumno_seleccionado.setCalificaciones((JsonArray) new Gson().toJsonTree(calificaciones_adapter.getDataSet(), new TypeToken<List<Calificacion>>() {
+            }.getType()));
+            alumnos.add(index, alumno_seleccionado);
+            //Actualizacion de grupo
+            index = grupos.indexOf(grupo_seleccionado);
+            grupos.remove(index);
+            grupo_seleccionado.setAlumnos((JsonArray) new Gson().toJsonTree(alumnos, new TypeToken<List<Alumno>>() {
+            }.getType()));
+            grupos.add(index, grupo_seleccionado);
+            //Actualizacion de asignatura
+            index = asignaturas.indexOf(asignatura_seleccionada);
+            asignaturas.remove(index);
+            asignatura_seleccionada.setGrupos((JsonArray) new Gson().toJsonTree(grupos, new TypeToken<List<Grupo>>() {
+            }.getType()));
+            asignaturas.add(index, asignatura_seleccionada);
+            //Actualizacion del usuario
+
+            JsonObject data_Usuario = new JsonObject();
+
+            JsonArray asignaturas_array = (JsonArray) new Gson().toJsonTree(asignaturas,
+                    new TypeToken<List<Asignatura>>() {
+                    }.getType());
+
+            data_Usuario.add("materias", asignaturas_array);
+
+            sms_service.update_data(data_Usuario, token, id_usuario).enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        Alert_Dialog.showWarnMessage(Inicio.this, "¡Correcto!", "Se han actualizado los datos")
+                                .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                    onStudentSelected(alumno_seleccionado);
+                                    return Unit.INSTANCE;
+                                }).show();
+                    } else {
+                        System.out.println(response.errorBody());
+                        Alert_Dialog.showErrorMessage(Inicio.this);
+                    }
+                }
+
+                @Override
+                public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
+                    System.out.println(t.getMessage());
+                    Alert_Dialog.showErrorMessage(Inicio.this);
+                }
+            });
+
+        });
 
         btnClose_Calif.setOnClickListener(v -> {
             popupCalificaciones.setVisibility(View.GONE);
+            lstCalificaciones.setAdapter(new ArrayAdapter<>(Inicio.this, android.R.layout.simple_list_item_1, new ArrayList<>()));
+            calificaciones.clear();
+            calificacion_refinada.clear();
+            rgParciales.setSelected(false);
+            rbPrimer.setSelected(false);
+            rbSegundo.setSelected(false);
+            rbTercer.setSelected(false);
         });
 
     }
