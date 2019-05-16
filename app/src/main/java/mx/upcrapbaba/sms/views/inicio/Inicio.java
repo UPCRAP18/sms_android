@@ -40,7 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Locale;
 
 import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
 import kotlin.Unit;
@@ -422,7 +422,11 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         return true;
     }
 
-
+    /**
+     * Listener al seleccionar un alumno del listview de alumnos en el grupo
+     *
+     * @param alumno_seleccionado --> Devuelve el alumno seleccionado del adaptador
+     */
     @Override
     public void onStudentSelected(Alumno alumno_seleccionado) {
         Button btnClose_Calif = popupCalificaciones.findViewById(R.id.btnClose_Calificaciones);
@@ -438,48 +442,119 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         }.getType());
         List<Calificacion> calificacion_refinada = new LinkedList<>();
 
-        AtomicInteger promedio_parcial = new AtomicInteger();
-        int promedio_general = 0;
+        ArrayList<Double> promedio_primer_parcial = new ArrayList<>();
+        ArrayList<Double> promedio_segundo_parcial = new ArrayList<>();
+        ArrayList<Double> promedio_tercer_parcial = new ArrayList<>();
+        ArrayList<Double> promedio_general = new ArrayList<>();
+        int cant_np = 0;
+
+
+        promedio_general.add(0, 0.0);
+
+        double promedio_final = 0;
+        for (Calificacion calificacion : calificaciones) {
+            if (!calificacion.getObtenido().equals("NP")) {
+                double obtenido = Double.parseDouble(calificacion.getObtenido());
+                double valor = Double.parseDouble(calificacion.getValor_actividad());
+                promedio_final += ((obtenido * valor) / 100);
+            } else {
+                cant_np++;
+            }
+        }
+
+        if (cant_np < calificaciones.size()) {
+            promedio_final /= 3;
+            promedio_general.add(0, promedio_final);
+            txtPromedio_General.setText(getResources().getString(R.string.lblPromGeneral, String.format(Locale.getDefault(), "%.2f", promedio_general.get(0))));
+            alumno_seleccionado.setPromedio(String.valueOf(promedio_final));
+        } else {
+            txtPromedio_General.setText(getResources().getString(R.string.lblPromGeneral, "NP"));
+            alumno_seleccionado.setPromedio("NP");
+        }
 
         rgParciales.setOnCheckedChangeListener((group, checkedId) -> {
             switch (group.getCheckedRadioButtonId()) {
                 case R.id.rbPrimer:
+                    promedio_primer_parcial.add(0, 0.0);
                     calificacion_refinada.clear();
+                    int cant_np_primer = 0;
                     for (Calificacion calificacion : calificaciones) {
                         if (calificacion.getParcial().equals("Primer Parcial")) {
                             calificacion_refinada.add(calificacion);
                             if (!calificacion.getObtenido().equals("NP")) {
-                                promedio_parcial.addAndGet((Integer.parseInt(calificacion.getObtenido()) * Integer.parseInt(calificacion.getValor_actividad())) / 100);
+                                double calificacion_final = promedio_primer_parcial.get(0);
+                                double obtenido = Double.parseDouble(calificacion.getObtenido());
+                                double valor = Double.parseDouble(calificacion.getValor_actividad());
+                                calificacion_final += obtenido * (valor / 100);
+                                promedio_primer_parcial.add(0, calificacion_final);
                             } else {
-
+                                cant_np_primer ++;
                             }
                         }
                     }
+                    if (cant_np_primer < calificacion_refinada.size()) {
+                        double promedio = promedio_primer_parcial.get(0);
+                        txtPromedio_Parcial.setText(getResources().getString(R.string.lblPromParc, String.format(Locale.getDefault(), "%.2f", promedio)));
+                    } else {
+                        txtPromedio_Parcial.setText(getResources().getString(R.string.lblPromParc,"NP"));
+                    }
                     break;
                 case R.id.rbSegundo:
+                    promedio_segundo_parcial.add(0, 0.0);
                     calificacion_refinada.clear();
+                    int cant_np_segundo = 0;
                     for (Calificacion calificacion : calificaciones) {
                         if (calificacion.getParcial().equals("Segundo Parcial")) {
                             calificacion_refinada.add(calificacion);
+                            if (!calificacion.getObtenido().equals("NP")) {
+                                double calificacion_final = promedio_segundo_parcial.get(0);
+                                double obtenido = Double.parseDouble(calificacion.getObtenido());
+                                double valor = Double.parseDouble(calificacion.getValor_actividad());
+                                calificacion_final += obtenido * (valor / 100);
+                                promedio_segundo_parcial.add(0, calificacion_final);
+                            } else {
+                                cant_np_segundo++;
+                            }
                         }
+                    }
+                    if (cant_np_segundo < calificacion_refinada.size()) {
+                        double promedio = promedio_segundo_parcial.get(0);
+                        txtPromedio_Parcial.setText(getResources().getString(R.string.lblPromParc, String.format(Locale.getDefault(), "%.2f", promedio)));
+                    } else {
+                        txtPromedio_Parcial.setText(getResources().getString(R.string.lblPromParc,"NP"));
                     }
                     break;
                 case R.id.rbTercer:
+                    promedio_tercer_parcial.add(0, 0.0);
                     calificacion_refinada.clear();
+                    int cant_np_tercer = 0;
                     for (Calificacion calificacion : calificaciones) {
                         if (calificacion.getParcial().equals("Tercer Parcial")) {
                             calificacion_refinada.add(calificacion);
+                            if (!calificacion.getObtenido().equals("NP")) {
+                                double calificacion_final = promedio_tercer_parcial.get(0);
+                                double obtenido = Double.parseDouble(calificacion.getObtenido());
+                                double valor = Double.parseDouble(calificacion.getValor_actividad());
+                                calificacion_final += obtenido * (valor / 100);
+                                promedio_tercer_parcial.add(0, calificacion_final);
+                            } else {
+                                cant_np_tercer++;
+                            }
                         }
+                    }
+                    if (cant_np_tercer < calificacion_refinada.size()) {
+                        double promedio = promedio_tercer_parcial.get(0);
+                        txtPromedio_Parcial.setText(getResources().getString(R.string.lblPromParc, String.format(Locale.getDefault(), "%.2f", promedio)));
+                    } else {
+                        txtPromedio_Parcial.setText(getResources().getString(R.string.lblPromParc,"NP"));
                     }
                     break;
             }
 
-            if (!calificacion_refinada.isEmpty()) {
 
+            if (!calificacion_refinada.isEmpty()) {
                 txtPromedio_General.setVisibility(View.VISIBLE);
                 txtPromedio_Parcial.setVisibility(View.VISIBLE);
-
-                txtPromedio_Parcial.setText(getResources().getString(R.string.lblPromParc, promedio_parcial));
 
                 calificaciones_adapter = new Calificaciones_Adapter(Inicio.this, calificacion_refinada);
 
@@ -492,14 +567,22 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
             }
         });
 
+
         popupCalificaciones.setVisibility(View.VISIBLE);
 
         btnSave.setOnClickListener(v -> {
             int index = alumnos.indexOf(alumno_seleccionado);
             //actualizacion de alumnos
             alumnos.remove(index);
-            alumno_seleccionado.setCalificaciones((JsonArray) new Gson().toJsonTree(calificaciones_adapter.getDataSet(), new TypeToken<List<Calificacion>>() {
+            calificaciones.removeAll(calificacion_refinada);
+            calificaciones.addAll(calificaciones_adapter.getDataSet());
+            alumno_seleccionado.setCalificaciones((JsonArray) new Gson().toJsonTree(calificaciones, new TypeToken<List<Calificacion>>() {
             }.getType()));
+            //if (cant_np < calificaciones.size() ){
+            //  alumno_seleccionado.setPromedio(String.valueOf(promedio_general.get(0)));
+            //}else {
+            //alumno_seleccionado.setPromedio("NP");
+            //}
             alumnos.add(index, alumno_seleccionado);
             //Actualizacion de grupo
             index = grupos.indexOf(grupo_seleccionado);
@@ -549,6 +632,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
 
         btnClose_Calif.setOnClickListener(v -> {
             popupCalificaciones.setVisibility(View.GONE);
+            rgParciales.clearCheck();
             lstCalificaciones.setAdapter(new ArrayAdapter<>(Inicio.this, android.R.layout.simple_list_item_1, new ArrayList<>()));
             calificaciones.clear();
             calificacion_refinada.clear();
@@ -556,9 +640,12 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
             rbPrimer.setSelected(false);
             rbSegundo.setSelected(false);
             rbTercer.setSelected(false);
+            txtPromedio_General.setVisibility(View.INVISIBLE);
+            txtPromedio_Parcial.setVisibility(View.INVISIBLE);
         });
 
     }
+
 
 }
 

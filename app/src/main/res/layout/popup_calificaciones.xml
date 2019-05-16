@@ -81,7 +81,8 @@
             android:text="@string/lblPromParc"
             android:textAlignment="center"
             android:textColor="@color/indigo_material"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/txtPromedioGeneral"
@@ -92,7 +93,8 @@
             android:text="@string/lblPromGeneral"
             android:textAlignment="center"
             android:textColor="@color/indigo_material"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:visibility="invisible" />
     </LinearLayout>
 
     <LinearLayout

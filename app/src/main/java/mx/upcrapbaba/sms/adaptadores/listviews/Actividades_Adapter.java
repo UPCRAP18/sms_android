@@ -83,7 +83,7 @@ public class Actividades_Adapter implements ListAdapter {
             LinearLayout layActividad = convertView.findViewById(R.id.layActivity_Info);
             EditText etNombre_Actividad = convertView.findViewById(R.id.etNombre_Actividad);
             EditText etValor_Actividad = convertView.findViewById(R.id.etValor_Actividad);
-            Spinner spParcial = convertView.findViewById(R.id.spParcial);
+            Spinner spParcial = convertView.findViewById(R.id.spParciales);
             ImageButton deleteActividad = convertView.findViewById(R.id.imgbDelete);
 
             btnActividad.setText(mContext.getResources().getString(R.string.btnActividad, actividad_actual.getNombre_actividad()));

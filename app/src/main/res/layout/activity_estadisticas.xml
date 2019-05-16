@@ -24,6 +24,151 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/AppBarLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="84dp">
+
+            <TextView
+                android:id="@+id/txtAsignaturas"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:layout_weight="2"
+                android:fontFamily="@font/andika"
+                android:text="@string/lblAsignaturas"
+                android:textAlignment="center"
+                android:textColor="@color/purple_material"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/txtGrupos"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/andika"
+                android:text="@string/lblGrupos"
+                android:textAlignment="center"
+                android:textColor="@color/purple_material"
+                android:textSize="20sp"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="84dp">
+
+            <Spinner
+                android:id="@+id/spAsignaturas_Estadisticas"
+                style="@style/SpinnerStyle"
+                android:layout_width="0dp"
+                android:layout_height="38dp"
+                android:layout_margin="4dp"
+                android:layout_weight="2"
+                android:dropDownWidth="wrap_content"
+                android:spinnerMode="dropdown" />
+
+            <Spinner
+                android:id="@+id/spGrupos_Estadisticas"
+                style="@style/SpinnerStyle"
+                android:layout_width="0dp"
+                android:layout_height="38dp"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:dropDownWidth="wrap_content"
+                android:visibility="visible" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lay_Promedio"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tgEstadisticas">
+
+        <TextView
+            android:id="@+id/lblPromedio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/lblPromedio"
+            android:textAlignment="center"
+            android:textColor="@color/indigo_material"
+            android:textSize="22sp" />
+
+        <com.anychart.AnyChartView
+            android:id="@+id/chartPromedio"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lay_Porcentaje"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tgEstadisticas">
+
+        <TextView
+            android:id="@+id/lblPorcentaje"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/lblPorcentaje"
+            android:textAlignment="center"
+            android:textColor="@color/indigo_material"
+            android:textSize="22sp" />
+
+        <com.anychart.AnyChartView
+            android:id="@+id/chartPorcentaje"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+
     <it.sephiroth.android.library.bottomnavigation.BottomNavigation
         android:id="@+id/bottom_nav_bar"
         android:layout_width="match_parent"
@@ -36,4 +181,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ToggleButton
+        android:id="@+id/tgEstadisticas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:checked="false"
+        android:textColor="@color/indigo_material"
+        android:textOff="@string/lblPorcentaje"
+        android:textOn="@string/lblPromedio"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

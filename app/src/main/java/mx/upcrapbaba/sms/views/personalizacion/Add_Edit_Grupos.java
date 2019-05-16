@@ -106,7 +106,7 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
         btnEdit_Criterios = findViewById(R.id.btnEditar_Criterios);
         spAsignaturas = findViewById(R.id.spAsignatura_to_select);
         txtAsignaturas = findViewById(R.id.txtAsignatura_Label);
-        popUpView = findViewById(R.id.popUpActividades);
+        popUpView = findViewById(R.id.popUpCriterios);
 
         sms_service.getUserInfo(token, id_usuario).enqueue(new Callback<User>() {
             @Override
@@ -496,8 +496,6 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
         }
 
         btnAdd_Actividad.setOnClickListener(v -> {
-
-            Toasty.success(Add_Edit_Grupos.this, "Toasty").show();
 
             actividades_general.add(new Actividad("Nueva Actividad", "0", "Primer Parcial"));
 

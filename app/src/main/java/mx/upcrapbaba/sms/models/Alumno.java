@@ -13,14 +13,17 @@ public class Alumno {
     @Expose
     private String apellidos;
     @Expose
+    private String promedio;
+    @Expose
     private String imagen_alumno;
     @SerializedName("calificaciones")
     private JsonArray calificaciones;
 
-    public Alumno(String matricula_alumno, String nombre_alumno, String apellidos, String imagen_alumno, JsonArray calificaciones) {
+    public Alumno(String matricula_alumno, String nombre_alumno, String apellidos, String promedio, String imagen_alumno, JsonArray calificaciones) {
         this.matricula_alumno = matricula_alumno;
         this.nombre_alumno = nombre_alumno;
         this.apellidos = apellidos;
+        this.promedio = promedio;
         this.imagen_alumno = imagen_alumno;
         this.calificaciones = calificaciones;
     }
@@ -50,6 +53,14 @@ public class Alumno {
 
     public void setApellidos(String apellidos) {
         this.apellidos = apellidos;
+    }
+
+    public String getPromedio() {
+        return promedio;
+    }
+
+    public void setPromedio(String promedio) {
+        this.promedio = promedio;
     }
 
     public String getImagen_alumno() {
