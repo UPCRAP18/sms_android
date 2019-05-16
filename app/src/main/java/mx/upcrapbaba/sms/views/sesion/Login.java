@@ -32,8 +32,6 @@ public class Login extends AppCompatActivity {
     private AVLoadingIndicatorView pbar;
     private SMSService sms_service;
 
-    //TODO Arreglar el restablecimiento de contraseña
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +45,6 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         Button btnRegister = findViewById(R.id.btnRegister);
         Button btnLogin = findViewById(R.id.btnLogin);
-        Button btnReset = findViewById(R.id.btnReset);
         etUsuario = findViewById(R.id.etMatricula);
         etPwd = findViewById(R.id.etUsuario_Apellidos);
         pbar = findViewById(R.id.PBar);
