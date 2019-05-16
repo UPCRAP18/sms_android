@@ -1,16 +1,13 @@
 package mx.upcrapbaba.sms.views.user_settings;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -19,7 +16,10 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.JsonObject;
 import com.wang.avi.AVLoadingIndicatorView;
 
+import org.jetbrains.annotations.NotNull;
+
 import es.dmoral.toasty.Toasty;
+import kotlin.Unit;
 import mx.upcrapbaba.sms.R;
 import mx.upcrapbaba.sms.api.ApiWeb;
 import mx.upcrapbaba.sms.api.Service.SMSService;
@@ -34,13 +34,11 @@ import retrofit2.Response;
 
 public class User_Profile extends AppCompatActivity {
 
-    private static int RESULT_CODE = 1;
-    private ImageButton imgEditPhoto;
-    private ImageView imgEdit;
     private DBHelper helper;
     private EditText etNombre, etApellidos, etEmail, etMatricula;
     private SMSService sms_service;
     private AVLoadingIndicatorView pbar;
+    private ImageView imgPhoto;
     private User usuario;
 
     @Override
@@ -58,6 +56,7 @@ public class User_Profile extends AppCompatActivity {
         etApellidos = findViewById(R.id.etApellidos);
         etEmail = findViewById(R.id.etEmail);
         etMatricula = findViewById(R.id.etMatricula);
+        imgPhoto = findViewById(R.id.imgPhoto);
 
         setData_User();
 
@@ -73,17 +72,6 @@ public class User_Profile extends AppCompatActivity {
             }
         });
 
-        imgEdit = findViewById(R.id.imgEdit);
-        imgEditPhoto = findViewById(R.id.imgPhoto);
-
-        imgEditPhoto.setOnClickListener(v -> {
-            uploadImage();
-        });
-
-        imgEdit.setOnClickListener(v -> {
-            uploadImage();
-        });
-
         Toolbar toolbar = findViewById(R.id.ToolBar);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
@@ -96,9 +84,7 @@ public class User_Profile extends AppCompatActivity {
             Alert_Dialog.showErrorMessage(this);
         }
 
-        btnSave.setOnClickListener(v -> {
-            update_Data();
-        });
+        btnSave.setOnClickListener(v -> update_Data());
 
     }
 
@@ -108,7 +94,7 @@ public class User_Profile extends AppCompatActivity {
 
         getUserData.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(@NotNull Call<User> call, @NotNull Response<User> response) {
                 pbar.smoothToShow();
                 if (response.isSuccessful() && response.body() != null) {
                     usuario = response.body();
@@ -117,20 +103,21 @@ public class User_Profile extends AppCompatActivity {
                     etApellidos.setText(usuario.getApellidos());
                     etEmail.setText(usuario.getEmail());
                     String url = new ApiWeb().getBASE_URL_GLITCH() + "/" + usuario.getImagen_perfil();
-                    Glide.with(User_Profile.this).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(url).into(imgEditPhoto);
+                    Glide.with(User_Profile.this).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(url).into(imgPhoto);
                     pbar.smoothToHide();
-
                 } else {
-                    //TODO HANDLE
-                    System.out.println("Ha ocurrido un error al obtener los datos \n" + response.message());
                     pbar.smoothToHide();
+                    System.out.println("Ha ocurrido un error al obtener los datos del usuario " + response.errorBody());
+                    Alert_Dialog.showErrorMessage(User_Profile.this);
                 }
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
-                System.out.println("Ha ocurrido un error en la request \n" + t.toString());
+            public void onFailure(@NotNull Call<User> call, @NotNull Throwable t) {
                 pbar.smoothToHide();
+                System.out.println("Ha ocurrido un error en la request para obtener los datos del usuario " + t.getMessage());
+                Alert_Dialog.showErrorMessage(User_Profile.this);
+
             }
         });
 
@@ -148,52 +135,31 @@ public class User_Profile extends AppCompatActivity {
 
         updateData.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+            public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
                 pbar.smoothToShow();
                 if (response.isSuccessful() && response.body() != null) {
-                    Toasty.success(User_Profile.this, response.body().get("message").toString()).show();
-                    User_Profile.this.recreate();
-                    pbar.smoothToHide();
+                    Alert_Dialog.showWarnMessage(User_Profile.this, getString(R.string.header_correcto), "Se han actualizado los datos")
+                            .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                User_Profile.this.recreate();
+                                return Unit.INSTANCE;
+                            }).show();
                 } else {
-                    System.out.println("Ha ocurrido un error al obtener los datos \n" + response.errorBody().toString());
                     pbar.smoothToHide();
+                    System.out.println("Ha ocurrido un error al actualizar los datos \n" + response.errorBody());
+                    Alert_Dialog.showErrorMessage(User_Profile.this);
                 }
             }
 
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
+            public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
                 pbar.smoothToHide();
+                System.out.println("Ha ocurrido un error en la request para actualizar los datos \n" + t.getMessage());
+                Alert_Dialog.showErrorMessage(User_Profile.this);
             }
         });
 
     }
 
-    private void uploadImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), RESULT_CODE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (resultCode != RESULT_CODE) {
-            return;
-        } else {
-            if (data != null) {
-                final Bundle extras = data.getExtras();
-                if (extras != null) {
-                    //Get image
-                    Bitmap newProfilePic = extras.getParcelable("data");
-
-                }
-            } else {
-                //TODO Handle
-            }
-
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -107,21 +107,6 @@
                     app:met_floatingLabel="highlight"
                     app:met_floatingLabelTextColor="@color/purple_material" />
 
-                <Button
-                    android:id="@+id/btnReset"
-                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_margin="4dp"
-                    android:gravity="center|end"
-                    android:text="@string/btnResetPwd"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@color/blue_material"
-                    android:textColorHighlight="@color/orange_light_material"
-                    android:textSize="14sp" />
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

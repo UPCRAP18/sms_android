@@ -7,7 +7,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,16 +41,13 @@ import retrofit2.Response;
 
 public class Add_Edit_Alumnos extends AppCompatActivity {
     private User user_data;
-    private Asignatura asignatura_seleccionada;
-    private Grupo grupo_seleccionado;
     private Alumno alumno_seleccionado;
     private List<Asignatura> asignaturas_original = new LinkedList<>();
-    private List<Grupo> grupos_original = new LinkedList<>();
     private List<Alumno> alumnos_general = new LinkedList<>(), alumnos_lineal_general = new LinkedList<>();
     private List<String> nombre_alumno = new LinkedList<>();
     private SMSService sms_service;
-    private String SELECCIONADO = "", token = "", id_usuario = "";
-    private LinearLayout layGrupos_Inscrito;
+    private String token = "";
+    private String id_usuario = "";
     private Spinner spAlumno;
     private EditText etMatricula_Alumno, etNombre_Alumno, etApellidos_Alumno;
     private Button btnGuardar;
@@ -76,7 +72,7 @@ public class Add_Edit_Alumnos extends AppCompatActivity {
 
         if (getSupportActionBar() != null) {
             if (getIntent().getStringExtra("SELECCIONADO") != null) {
-                SELECCIONADO = getIntent().getStringExtra("SELECCIONADO");
+                String SELECCIONADO = getIntent().getStringExtra("SELECCIONADO");
                 getSupportActionBar().setTitle(getResources().getString(R.string.barTitle, SELECCIONADO));
             }
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -100,7 +96,6 @@ public class Add_Edit_Alumnos extends AppCompatActivity {
                             List<Alumno> alumnos_grupo = new Gson().fromJson(grupo.getAlumnos(), new TypeToken<List<Alumno>>() {
                             }.getType());
                             alumnos_general.addAll(alumnos_grupo);
-                            grupos_original.add(grupo);
                         }
 
                     }
@@ -143,21 +138,18 @@ public class Add_Edit_Alumnos extends AppCompatActivity {
 
                             }
                         });
-                    } else {
-
                     }
-
-
-
                 } else {
-                    //TODO HANDLE
+                    Alert_Dialog.showErrorMessage(Add_Edit_Alumnos.this);
+                    System.out.println("Error al obtener la informacion de los alumnos \n" + response.errorBody());
                 }
 
             }
 
             @Override
             public void onFailure(@NotNull Call<User> call, @NotNull Throwable t) {
-                //TODO HANDLE
+                Alert_Dialog.showErrorMessage(Add_Edit_Alumnos.this);
+                System.out.println("Error al realizar la request para obtener la informacion de los alumnos \n" + t.getMessage());
             }
         });
 
@@ -223,16 +215,16 @@ public class Add_Edit_Alumnos extends AppCompatActivity {
                                     }).show();
 
                         } else {
-                            Toasty.warning(Add_Edit_Alumnos.this, "Ha ocurrido un error al actualizar los alumnos").show();
-                            System.out.println("Error al actualizar los datos del usuario " + response.errorBody());
+                            System.out.println("Ha ocurrido un error al actualizar los alumnos " + response.errorBody());
+                            Alert_Dialog.showErrorMessage(Add_Edit_Alumnos.this);
                         }
 
                     }
 
                     @Override
                     public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
-                        Toasty.warning(Add_Edit_Alumnos.this, "Ha ocurrido un error en la request para actualizar los datos").show();
-                        System.out.println("Error al actualizar los datos del usuario " + t.getMessage());
+                        System.out.println("Ha ocurrido un error en la request para actualizar los datos " + t.getMessage());
+                        Alert_Dialog.showErrorMessage(Add_Edit_Alumnos.this);
                     }
                 });
 
@@ -248,19 +240,22 @@ public class Add_Edit_Alumnos extends AppCompatActivity {
                     @Override
                     public void onResponse(@NotNull Call<JsonObject> call, @NotNull Response<JsonObject> response) {
                         if (response.isSuccessful() && response.body() != null) {
-                            //Alert_Dialog.showMessage(Add_Edit_Alumnos.this, getString(R.string));
-                            Add_Edit_Alumnos.this.recreate();
+                            Alert_Dialog.showWarnMessage(Add_Edit_Alumnos.this, "¡Correcto!", "Se ha creado el alumno")
+                                    .positiveButton(R.string.aceptar, null, materialDialog -> {
+                                        Add_Edit_Alumnos.this.recreate();
+                                        return Unit.INSTANCE;
+                                    }).show();
                         } else {
-                            Toasty.warning(Add_Edit_Alumnos.this, "Ha ocurrido un error").show();
-                            System.out.println("Ha ocurrido un error al crear el alumno " + response.errorBody());
+                            System.out.println("Ha ocurrido un error al crear un nuevo alumno " + response.errorBody());
+                            Alert_Dialog.showErrorMessage(Add_Edit_Alumnos.this);
                         }
 
                     }
 
                     @Override
                     public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
-                        Toasty.warning(Add_Edit_Alumnos.this, "Ha ocurrido un error").show();
-                        System.out.println("Ha ocurrido un error en la request para crear el alumno " + t.getMessage());
+                        System.out.println("Ha ocurrido un error en la request al crear un nuevo alumno " + t.getMessage());
+                        Alert_Dialog.showErrorMessage(Add_Edit_Alumnos.this);
                     }
                 });
 

@@ -219,16 +219,6 @@
                         android:textColor="@color/colorAccent"
                         android:textSize="18sp" />
 
-                    <TextView
-                        android:id="@+id/txtPwd"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="4dp"
-                        android:layout_weight="1"
-                        android:text="@string/ht_pwd"
-                        android:textAlignment="center"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="18sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -251,21 +241,6 @@
                         android:textColor="@color/colorPrimaryDark"
                         android:textSize="18sp" />
 
-                    <EditText
-                        android:id="@+id/etPwd"
-                        style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="4dp"
-                        android:layout_weight="1"
-                        android:ems="10"
-                        android:enabled="false"
-                        android:hint="@string/ht_pwd"
-                        android:inputType="textPassword"
-                        android:text="@string/holder_pwd"
-                        android:textAlignment="center"
-                        android:textColor="@color/colorPrimaryDark"
-                        android:textSize="18sp" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -280,21 +255,6 @@
                 android:padding="8dp"
                 android:text="@string/logout"
                 android:textAlignment="center"
-                android:textColor="@color/indigo_material"
-                android:textSize="14sp" />
-
-            <Button
-                android:id="@+id/btnChangePwd"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="12dp"
-                android:background="@color/transparent"
-                android:drawableStart="@drawable/edit"
-                android:drawablePadding="12dp"
-                android:padding="8dp"
-                android:text="@string/change_pwd"
-                android:textAlignment="textStart"
                 android:textColor="@color/indigo_material"
                 android:textSize="14sp" />
 

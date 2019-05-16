@@ -50,7 +50,8 @@ import retrofit2.Response;
 
 public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGrupo_Adapter.AlumnoListener, AlumnosOnline_EditGrupo_Adapter.AlumnoOnlineListener, Actividades_Adapter.ItemSelected {
 
-    private String token = "", id_usuario = "", PARCIAL_SELECCIONADO = "";
+    private String token = "";
+    private String id_usuario = "";
     private User user_data;
     private List<Asignatura> asignaturas_original = new LinkedList<>(), asignaturas_repeated = new LinkedList<>();
     private ArrayDeque<Asignatura> asignaturas_temporal = new ArrayDeque<>();
@@ -59,7 +60,9 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
     private ArrayDeque<String> grupos_for_spinner = new ArrayDeque<>();
     private EditText etNombre_Grupo;
     private Spinner spGrupos, spAsignaturas;
-    private Button btnSeleccionar_Grupo, btnEliminar_Alumnos, btnEdit_Criterios, btnCerrar_Popup, btnAdd_Actividad;
+    private Button btnSeleccionar_Grupo;
+    private Button btnEliminar_Alumnos;
+    private Button btnEdit_Criterios;
     private ListView lstAlumnos_Inscritos, lstAlumnos_Online, lstActividades;
     private Grupo grupo_seleccionado = null;
     private TextView txtAsignaturas;
@@ -273,6 +276,7 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
                     for (int j = 0; j < alumnos_to_remove.size(); j++) {
                         if (alumnos_original.get(i).getMatricula_alumno().equals(alumnos_to_remove.get(j).getMatricula_alumno())) {
                             alumnos_original.remove(i);
+                            i--;
                         }
                     }
                 }
@@ -302,6 +306,7 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
                 for (int i = 0; i < alumnos_inscritos.size(); i++) {
                     alumnos_inscritos.get(i).setCalificaciones((JsonArray) new Gson().toJsonTree(calificaciones_alumno, new TypeToken<List<Calificacion>>() {
                     }.getType()));
+                    alumnos_inscritos.get(i).setPromedio("0");
                 }
 
                 grupo_seleccionado.setAlumnos((JsonArray) new Gson().toJsonTree(alumnos_inscritos, new TypeToken<List<Alumno>>() {
@@ -337,15 +342,15 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
                                     return Unit.INSTANCE;
                                 }).show();
                     } else {
-                        Toasty.error(Add_Edit_Grupos.this, "Ha ocurrido un error en la request").show();
-                        System.out.println("Error al actualizar los valores " + response.errorBody());
+                        System.out.println("Error al actualizar los datos del usuario " + response.errorBody());
+                        Alert_Dialog.showErrorMessage(Add_Edit_Grupos.this);
                     }
                 }
 
                 @Override
                 public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
-                    Toasty.error(Add_Edit_Grupos.this, "Ha ocurrido un error en la request").show();
-                    System.out.println("Error en la request " + t.getMessage());
+                    System.out.println("Error en la request para actualizar los datos del usuario " + t.getMessage());
+                    Alert_Dialog.showErrorMessage(Add_Edit_Grupos.this);
                 }
             });
 
@@ -427,27 +432,27 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
                                                 return Unit.INSTANCE;
                                             }).show();
                                 } else {
-                                    Toasty.info(Add_Edit_Grupos.this, "Ha ocurrido un error al añadir el grupo").show();
-                                    System.out.println(response.errorBody());
+                                    System.out.println("Error al crear el grupo " + response.errorBody());
+                                    Alert_Dialog.showErrorMessage(Add_Edit_Grupos.this);
                                 }
                             }
 
                             @Override
                             public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
-                                Toasty.info(Add_Edit_Grupos.this, "Ha ocurrido un error en la request").show();
-                                System.out.println(t.getMessage());
+                                System.out.println("Error en la request al crear el grupo " + t.getMessage());
+                                Alert_Dialog.showErrorMessage(Add_Edit_Grupos.this);
                             }
                         });
                     } else {
-                        Toasty.info(Add_Edit_Grupos.this, "Ha ocurrido un error al añadir el grupo").show();
-                        System.out.println(response.errorBody());
+                        System.out.println("Error al agregar el grupo " + response.errorBody());
+                        Alert_Dialog.showErrorMessage(Add_Edit_Grupos.this);
                     }
                 }
 
                 @Override
                 public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
-                    Toasty.info(Add_Edit_Grupos.this, "Ha ocurrido un error en la request").show();
-                    System.out.println(t.getMessage());
+                    System.out.println("Error en la request para agregar el grupo " + t.getMessage());
+                    Alert_Dialog.showErrorMessage(Add_Edit_Grupos.this);
                 }
             });
 
@@ -481,9 +486,9 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
 
     private void initDataPopUp() {
         lstActividades = popUpView.findViewById(R.id.lstActividades);
-        btnCerrar_Popup = popUpView.findViewById(R.id.btnClose);
+        Button btnCerrar_Popup = popUpView.findViewById(R.id.btnClose);
         Button btnGuardar_Criterios = popUpView.findViewById(R.id.btnSaveCriterios);
-        btnAdd_Actividad = popUpView.findViewById(R.id.btnAddActividad);
+        Button btnAdd_Actividad = popUpView.findViewById(R.id.btnAddActividad);
 
         actividades_general = new Gson().fromJson(grupo_seleccionado.getCriterios(), new TypeToken<List<Actividad>>() {
         }.getType());

@@ -13,16 +13,11 @@ import android.widget.ToggleButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.anychart.AnyChart;
-import com.anychart.AnyChartView;
-import com.anychart.chart.common.dataentry.DataEntry;
-import com.anychart.chart.common.dataentry.ValueDataEntry;
-import com.anychart.charts.Cartesian;
-import com.anychart.core.cartesian.series.Column;
-import com.anychart.enums.Anchor;
-import com.anychart.enums.HoverMode;
-import com.anychart.enums.Position;
-import com.anychart.enums.TooltipPositionMode;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -50,7 +45,7 @@ import retrofit2.Response;
 public class Estadisticas extends AppCompatActivity implements BottomNavigation.OnMenuItemSelectionListener {
 
     private User user_data;
-    private AnyChartView chartPromedio, chartPorcentaje;
+    private BarChart chartPromedio, chartPorcentaje;
     private Spinner spAsignaturas, spGrupos;
     private List<Asignatura> asignaturas = new LinkedList<>();
     private Asignatura asignatura_seleccionada;
@@ -81,9 +76,6 @@ public class Estadisticas extends AppCompatActivity implements BottomNavigation.
 
         spAsignaturas = findViewById(R.id.spAsignaturas_Estadisticas);
         spGrupos = findViewById(R.id.spGrupos_Estadisticas);
-        tgType = findViewById(R.id.tgEstadisticas);
-        layPorcentaje = findViewById(R.id.lay_Porcentaje);
-        layPromedio = findViewById(R.id.lay_Promedio);
 
         Toolbar toolbar = findViewById(R.id.ToolBar);
         toolbar.setTitleTextColor(Color.WHITE);
@@ -97,16 +89,6 @@ public class Estadisticas extends AppCompatActivity implements BottomNavigation.
         }
 
         getUserInfo(sms_service, token, id_usuario);
-
-        tgType.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                layPromedio.setVisibility(View.VISIBLE);
-                layPorcentaje.setVisibility(View.GONE);
-            } else {
-                layPromedio.setVisibility(View.GONE);
-                layPorcentaje.setVisibility(View.VISIBLE);
-            }
-        });
 
     }
 
@@ -127,7 +109,7 @@ public class Estadisticas extends AppCompatActivity implements BottomNavigation.
                     }
 
                 } else {
-                    System.out.println(response.errorBody());
+                    System.out.println("Ha ocurrido un error al obtener los datos " + response.errorBody());
                     Alert_Dialog.showErrorMessage(Estadisticas.this);
                 }
             }
@@ -206,14 +188,13 @@ public class Estadisticas extends AppCompatActivity implements BottomNavigation.
                     double reprobados_final = (cant_reprobados * 100) / alumnos.size();
                     double np_final = (cant_np * 100) / alumnos.size();
 
-                    double promedio_final_aprobados = promedio_aprobados / alumnos.size();
-                    double promedio_final_reprobados = promedio_reprobados / alumnos.size();
-                    double promedio_final_general = (promedio_aprobados + promedio_final_reprobados) / alumnos.size();
+                    double promedio_final_aprobados = promedio_aprobados / cant_aprobados;
+                    double promedio_final_reprobados = promedio_reprobados / cant_reprobados;
+                    double promedio_final_general = (promedio_final_aprobados + promedio_final_reprobados) / alumnos.size();
 
-                    loadDataPorcentajeCharts(aprobados_final, reprobados_final, np_final);
+                    setDataPorcentaje(aprobados_final, reprobados_final, np_final);
 
-                    loadDataPromedioCharts(promedio_final_aprobados, promedio_final_reprobados, promedio_final_general);
-
+                    setDataPromedio(promedio_final_aprobados, promedio_final_reprobados, promedio_final_general);
 
                 }
 
@@ -226,72 +207,65 @@ public class Estadisticas extends AppCompatActivity implements BottomNavigation.
         });
     }
 
+    private void setDataPromedio(double promedio_final_aprobados, double promedio_final_reprobados, double promedio_final_general) {
+        ArrayList<BarEntry> aprobados = new ArrayList<>();
+        ArrayList<BarEntry> reprobados = new ArrayList<>();
+        ArrayList<BarEntry> general = new ArrayList<>();
 
-    private void loadDataPorcentajeCharts(double aprobados, double reprobados, double np) {
+        aprobados.add(new BarEntry(0, (float) promedio_final_aprobados));
+        reprobados.add(new BarEntry(1, (float) promedio_final_reprobados));
+        general.add(new BarEntry(2, (float) promedio_final_general));
 
-        Cartesian cartesian = AnyChart.column();
+        BarDataSet dataSetAprobados = new BarDataSet(aprobados, "Aprobados");
+        BarDataSet dataSetReprobados = new BarDataSet(reprobados, "Reprobados");
+        BarDataSet dataSetGeneral = new BarDataSet(general, "General");
 
-        List<DataEntry> data = new ArrayList<>();
-        data.add(new ValueDataEntry("Aprobados", aprobados));
-        data.add(new ValueDataEntry("Reprobados", reprobados));
-        data.add(new ValueDataEntry("NP", np));
+        dataSetAprobados.setColors(ColorTemplate.JOYFUL_COLORS);
+        dataSetReprobados.setColors(ColorTemplate.COLORFUL_COLORS);
+        dataSetGeneral.setColors(ColorTemplate.MATERIAL_COLORS);
 
-        Column column = cartesian.column(data);
+        BarData barData = new BarData();
+        barData.addDataSet(dataSetAprobados);
+        barData.addDataSet(dataSetReprobados);
+        barData.addDataSet(dataSetGeneral);
 
-        column.tooltip()
-                .titleFormat("{%X}")
-                .position(Position.CENTER_BOTTOM)
-                .anchor(Anchor.CENTER_BOTTOM)
-                .offsetX(0d)
-                .offsetY(10d)
-                .format("{%Value}{groupsSeparator: }%");
 
-        cartesian.animation(true);
+        chartPromedio.animateY(3000);
 
-        cartesian.yScale().minimum(0d);
-
-        cartesian.yAxis(0).labels().format("{%Value}{groupsSeparator: }%");
-
-        cartesian.tooltip().positionMode(TooltipPositionMode.POINT);
-        cartesian.interactivity().hoverMode(HoverMode.BY_X);
-
-        chartPorcentaje.setChart(cartesian);
-
+        chartPromedio.setData(barData);
+        chartPromedio.invalidate();
 
     }
 
-    private void loadDataPromedioCharts(double aprobados, double reprobados, double general) {
+    private void setDataPorcentaje(double aprobados_final, double reprobados_final, double np_final) {
+        ArrayList<BarEntry> aprobados = new ArrayList<>();
+        ArrayList<BarEntry> reprobados = new ArrayList<>();
+        ArrayList<BarEntry> np = new ArrayList<>();
 
-        Cartesian cartesian = AnyChart.column();
+        aprobados.add(new BarEntry(0, (float) aprobados_final));
+        reprobados.add(new BarEntry(1, (float) reprobados_final));
+        np.add(new BarEntry(2, (float) np_final));
 
-        List<DataEntry> data = new ArrayList<>();
-        data.add(new ValueDataEntry("Aprobados", aprobados));
-        data.add(new ValueDataEntry("Reprobados", reprobados));
-        data.add(new ValueDataEntry("General", general));
+        BarDataSet dataSetAprobados = new BarDataSet(aprobados, "Aprobados");
+        BarDataSet dataSetReprobados = new BarDataSet(reprobados, "Reprobados");
+        BarDataSet dataSetNP = new BarDataSet(np, "NP");
 
-        Column column = cartesian.column(data);
+        dataSetAprobados.setColors(ColorTemplate.LIBERTY_COLORS);
+        dataSetReprobados.setColors(ColorTemplate.MATERIAL_COLORS);
+        dataSetNP.setColors(ColorTemplate.PASTEL_COLORS);
 
-        column.tooltip()
-                .titleFormat("{%X}")
-                .position(Position.CENTER_BOTTOM)
-                .anchor(Anchor.CENTER_BOTTOM)
-                .offsetX(0d)
-                .offsetY(10d)
-                .format("{%Value}{groupsSeparator: }%");
+        BarData barData = new BarData();
+        barData.addDataSet(dataSetAprobados);
+        barData.addDataSet(dataSetReprobados);
+        barData.addDataSet(dataSetNP);
 
-        cartesian.animation(true);
+        chartPorcentaje.animateY(3000);
 
-        cartesian.yScale().minimum(0d);
-
-        cartesian.yAxis(0).labels().format("{%Value}{groupsSeparator: }%");
-
-        cartesian.tooltip().positionMode(TooltipPositionMode.POINT);
-        cartesian.interactivity().hoverMode(HoverMode.BY_X);
-
-        chartPromedio.setChart(cartesian);
-
+        chartPorcentaje.setData(barData);
+        chartPorcentaje.invalidate();
 
     }
+
 
     @Override
     public void onBackPressed() {

@@ -1,6 +1,5 @@
 package mx.upcrapbaba.sms.views.personalizacion;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
@@ -46,7 +45,7 @@ import retrofit2.Response;
 
 public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Edit_Adapter.GroupListener, Asignaturas_Edit_Adapter.AsignaturaListener {
 
-    private String SELECCIONADO = "", token = "";
+    private String token = "";
     private User user_data;
     private List<Asignatura> asignaturas_original = new LinkedList<>(), asignaturas = new LinkedList<>();
     private List<Grupo> grupos = new LinkedList<>(), grupos_to_add = new LinkedList<>();
@@ -55,10 +54,9 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
     private Spinner spAsignaturas;
     private ImageView imgAsignatura;
     private Button btnSeleccionar_Asignatura;
-    private int REQUEST_GET_SINGLE_FILE = 1;
-    private boolean isForUpdate = false, isDeletedAsign = false;
+    private boolean isForUpdate = false;
     private ListView lstGrupos, lstAsignaturas;
-    private Asignatura asignatura_seleccionada, asignatura_temporal;
+    private Asignatura asignatura_seleccionada;
     private TextView txtTipo_Grupo;
     private SMSService sms_service;
 
@@ -72,25 +70,13 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
         token = "Bearer " + new DBHelper(this).getData_Usuario().get(1);
         String id_usuario = new DBHelper(this).getData_Usuario().get(0);
 
-        if (getIntent().getExtras() != null) {
-            SELECCIONADO = getIntent().getStringExtra("SELECCIONADO");
-        } else {
-            Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
-                    .positiveButton(R.string.aceptar, null, materialDialog -> {
-                        startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
-                        Add_Edit_Asignaturas.this.finish();
-                        return Unit.INSTANCE;
-                    }).show();
-
-        }
-
         Toolbar toolbar = findViewById(R.id.ToolBar);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
             if (getIntent().getStringExtra("SELECCIONADO") != null) {
-                SELECCIONADO = getIntent().getStringExtra("SELECCIONADO");
+                String SELECCIONADO = getIntent().getStringExtra("SELECCIONADO");
                 getSupportActionBar().setTitle(getResources().getString(R.string.barTitle, SELECCIONADO));
             }
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -143,25 +129,15 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
                 if (response.isSuccessful() && response.body() != null) {
                     lstAsignaturas.setAdapter(new Asignaturas_Edit_Adapter(Add_Edit_Asignaturas.this, response.body(), Add_Edit_Asignaturas.this));
                 } else {
-                    Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
-                            .positiveButton(R.string.aceptar, null, materialDialog -> {
-                                startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
-                                Add_Edit_Asignaturas.this.finish();
-                                return Unit.INSTANCE;
-                            }).show();
                     System.out.println("Error al obtener las asignaturas del servidor \n" + response.errorBody());
+                    Alert_Dialog.showErrorMessage(Add_Edit_Asignaturas.this);
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call<List<Asignatura>> call, @NotNull Throwable t) {
-                Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
-                        .positiveButton(R.string.aceptar, null, materialDialog -> {
-                            startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
-                            Add_Edit_Asignaturas.this.finish();
-                            return Unit.INSTANCE;
-                        }).show();
                 System.out.println("Error en la request para obtener las asignaturas del servidor \n" + t.getMessage());
+                Alert_Dialog.showErrorMessage(Add_Edit_Asignaturas.this);
             }
         });
 
@@ -197,34 +173,16 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
                         }
                     });
 
-                    //TODO FIX THISSSS
-                    imgAsignatura.setOnClickListener(v -> {
-                        /*Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                        intent.addCategory(Intent.CATEGORY_OPENABLE);
-                        intent.setType("image/*");
-                        startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_GET_SINGLE_FILE);*/
-                    });
-
                 } else {
-                    Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
-                            .positiveButton(R.string.aceptar, null, materialDialog -> {
-                                startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
-                                Add_Edit_Asignaturas.this.finish();
-                                return Unit.INSTANCE;
-                            }).show();
                     System.out.println("Error al obtener la informacion de usuario del servidor \n" + response.errorBody());
+                    Alert_Dialog.showErrorMessage(Add_Edit_Asignaturas.this);
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call<User> call, @NotNull Throwable t) {
-                Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
-                        .positiveButton(R.string.aceptar, null, materialDialog -> {
-                            startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
-                            Add_Edit_Asignaturas.this.finish();
-                            return Unit.INSTANCE;
-                        }).show();
                 System.out.println("Error en la request para obtener la informacion de usuario del servidor \n" + t.getMessage());
+                Alert_Dialog.showErrorMessage(Add_Edit_Asignaturas.this);
             }
         });
 
@@ -240,7 +198,6 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
                         asignaturas.remove(asignatura_seleccionada);
                         ArrayDeque<Asignatura> asignaturas_temporal = new ArrayDeque<>(asignaturas);
                         asignaturas_temporal.removeLast();
-                        //asignaturas_temporal.remove(asignatura_seleccionada);
                         asignaturas_original.clear();
                         asignaturas_original.addAll(asignaturas_temporal);
                         asignatura_seleccionada.setCodigo_materia(codigo_mat);
@@ -275,32 +232,21 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
                                         if (response.isSuccessful() && response.body() != null){
                                             Add_Edit_Asignaturas.this.recreate();
                                         }else {
-                                            Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
-                                                    .positiveButton(R.string.aceptar, null, materialDialog -> {
-                                                        startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
-                                                        Add_Edit_Asignaturas.this.finish();
-                                                        return Unit.INSTANCE;
-                                                    }).show();
-                                            System.out.println("Error al obtener la informacion de usuario del servidor \n" + response.errorBody());
+                                            System.out.println("Error al actualizar la informacion de usuario del servidor \n" + response.errorBody());
+                                            Alert_Dialog.showErrorMessage(Add_Edit_Asignaturas.this);
                                         }
                                     }
 
                                     @Override
                                     public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
-                                        Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
-                                                .positiveButton(R.string.aceptar, null, materialDialog -> {
-                                                    startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
-                                                    Add_Edit_Asignaturas.this.finish();
-                                                    return Unit.INSTANCE;
-                                                }).show();
-                                        System.out.println("Error al realizar la request para obtener la informacion de usuario del servidor \n" + t.getMessage());
+                                        System.out.println("Error al realizar la request para actualizar la informacion de usuario del servidor \n" + t.getMessage());
+                                        Alert_Dialog.showErrorMessage(Add_Edit_Asignaturas.this);
                                     }
                                 });
 
                             }).create().show();
 
                 } else {
-                    //Quiere guardar el codigo o nombre vacio
                     Toasty.warning(Add_Edit_Asignaturas.this, getResources().getString(R.string.err_Add_Edit_Asignatura)).show();
                 }
             } else {
@@ -349,50 +295,30 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
                                                         Add_Edit_Asignaturas.this.recreate();
                                                         return Unit.INSTANCE;
                                                     }).show();
-                                            Add_Edit_Asignaturas.this.recreate();
                                         } else {
-                                            Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
-                                                    .positiveButton(R.string.aceptar, null, materialDialog -> {
-                                                        startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
-                                                        Add_Edit_Asignaturas.this.finish();
-                                                        return Unit.INSTANCE;
-                                                    }).show();
                                             System.out.println("Error al actualizar los datos de usuario (materias) \n" + response.errorBody());
+                                            Alert_Dialog.showErrorMessage(Add_Edit_Asignaturas.this);
                                         }
                                     }
 
                                     @Override
                                     public void onFailure(@NotNull Call<JsonObject> call, @NotNull Throwable t) {
-                                        Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
-                                                .positiveButton(R.string.aceptar, null, materialDialog -> {
-                                                    startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
-                                                    Add_Edit_Asignaturas.this.finish();
-                                                    return Unit.INSTANCE;
-                                                }).show();
                                         System.out.println("Error en la request para actualizar los datos de usuario (materias) \n" + t.getMessage());
+                                        Alert_Dialog.showErrorMessage(Add_Edit_Asignaturas.this);
                                     }
                                 });
 
                             } else {
-                                Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
-                                        .positiveButton(R.string.aceptar, null, materialDialog -> {
-                                            startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
-                                            Add_Edit_Asignaturas.this.finish();
-                                            return Unit.INSTANCE;
-                                        }).show();
                                 System.out.println("Error al añadir la nueva asignatura \n" + response.errorBody());
+                                Alert_Dialog.showErrorMessage(Add_Edit_Asignaturas.this);
                             }
+
                         }
 
                         @Override
                         public void onFailure(Call<JsonObject> call, Throwable t) {
-                            Alert_Dialog.showWarnMessage(Add_Edit_Asignaturas.this, getString(R.string.header_warning), getString(R.string.request_error))
-                                    .positiveButton(R.string.aceptar, null, materialDialog -> {
-                                        startActivity(new Intent(Add_Edit_Asignaturas.this, Add_Edit_Asignaturas.class));
-                                        Add_Edit_Asignaturas.this.finish();
-                                        return Unit.INSTANCE;
-                                    }).show();
                             System.out.println("Error en la request para añadir la nueva asignatura \n" + t.getMessage());
+                            Alert_Dialog.showErrorMessage(Add_Edit_Asignaturas.this);
                         }
                     });
 
@@ -636,47 +562,5 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
         isForUpdate = true;
 
     }
-
-    //TODO FIX THIS
-    /*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        try {
-            if (resultCode == RESULT_OK) {
-                if (requestCode == REQUEST_GET_SINGLE_FILE) {
-                    Uri selectedImageUri = data.getData();
-                    // Get the path from the Uri
-                    final String path = getPathFromURI(selectedImageUri);
-                    if (path != null) {
-                        File f = new File(path);
-                        selectedImageUri = Uri.fromFile(f);
-                    }
-
-                    // Set the image in ImageView
-                    imgAsignatura.setImageURI(selectedImageUri);
-                }
-            }
-        } catch (Exception e) {
-            Timber.tag("FileSelectorActivity").e(e, "File select error");
-        }
-
-    }
-
-    public String getPathFromURI(Uri contentUri) {
-        String res = null;
-        String[] proj = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            res = cursor.getString(column_index);
-        }
-        if (cursor != null) {
-            cursor.close();
-        }
-        return res;
-    }
-
- */
 
 }

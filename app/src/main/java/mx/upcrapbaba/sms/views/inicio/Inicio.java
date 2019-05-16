@@ -89,6 +89,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
     private Asignatura asignatura_seleccionada;
     private Grupo grupo_seleccionado;
     private SMSService sms_service;
+    private List<Calificacion> calificaciones = new LinkedList<>();
 
     /**
      * Comprueba el estado de la red del telefono
@@ -154,17 +155,11 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         FloatingActionButton fab_Add_Grupo = findViewById(R.id.fabAddGrupo);
 
 
-        fab_Add_Asignatura.setOnClickListener(v -> {
-            startActivityForResult(new Intent(Inicio.this, Add_Edit_Asignaturas.class).putExtra("SELECCIONADO", "Asignaturas"), RESULT_POPUP);
-        });
+        fab_Add_Asignatura.setOnClickListener(v -> startActivityForResult(new Intent(Inicio.this, Add_Edit_Asignaturas.class).putExtra("SELECCIONADO", "Asignaturas"), RESULT_POPUP));
 
-        fab_Add_Alumno.setOnClickListener(v -> {
-            startActivityForResult(new Intent(Inicio.this, Add_Edit_Alumnos.class).putExtra("SELECCIONADO", "Alumnos"), RESULT_POPUP);
-        });
+        fab_Add_Alumno.setOnClickListener(v -> startActivityForResult(new Intent(Inicio.this, Add_Edit_Alumnos.class).putExtra("SELECCIONADO", "Alumnos"), RESULT_POPUP));
 
-        fab_Add_Grupo.setOnClickListener(v -> {
-            startActivityForResult(new Intent(Inicio.this, Add_Edit_Grupos.class).putExtra("SELECCIONADO", "Grupos"), RESULT_POPUP);
-        });
+        fab_Add_Grupo.setOnClickListener(v -> startActivityForResult(new Intent(Inicio.this, Add_Edit_Grupos.class).putExtra("SELECCIONADO", "Grupos"), RESULT_POPUP));
 
         Toolbar toolbar = findViewById(R.id.ToolBar);
         toolbar.setTitleTextColor(Color.WHITE);
@@ -178,6 +173,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
             Alert_Dialog.showErrorMessage(this);
         }
 
+
         mSearchBar.addTextChangeListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -186,7 +182,7 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (mSearchBar != null) {
+                if (alumnos_adapter != null) {
                     List<Alumno> filteredList = alumnos_adapter.getfilterData(s.toString());
                     if (filteredList.size() >= 1) {
                         Alumnos_GeneralList_Adapter filterResults =
@@ -240,7 +236,6 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
      * @param i1 --> Indice seleccionado
      * @param b  --> Animacion (Cierto o falso)
      */
-    //TODO Actualizar para lograr la navegacion
     @Override
     public void onMenuItemSelect(int i, int i1, boolean b) {
         switch (i1) {
@@ -438,7 +433,8 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
         RadioButton rbTercer = popupCalificaciones.findViewById(R.id.rbTercer);
         TextView txtPromedio_Parcial = popupCalificaciones.findViewById(R.id.txtPromedioParcial);
         TextView txtPromedio_General = popupCalificaciones.findViewById(R.id.txtPromedioGeneral);
-        List<Calificacion> calificaciones = new Gson().fromJson(alumno_seleccionado.getCalificaciones(), new TypeToken<List<Calificacion>>() {
+        calificaciones.clear();
+        calificaciones = new Gson().fromJson(alumno_seleccionado.getCalificaciones(), new TypeToken<List<Calificacion>>() {
         }.getType());
         List<Calificacion> calificacion_refinada = new LinkedList<>();
 
@@ -466,7 +462,6 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
             promedio_final /= 3;
             promedio_general.add(0, promedio_final);
             txtPromedio_General.setText(getResources().getString(R.string.lblPromGeneral, String.format(Locale.getDefault(), "%.2f", promedio_general.get(0))));
-            alumno_seleccionado.setPromedio(String.valueOf(promedio_final));
         } else {
             txtPromedio_General.setText(getResources().getString(R.string.lblPromGeneral, "NP"));
             alumno_seleccionado.setPromedio("NP");
@@ -578,11 +573,25 @@ public class Inicio extends AppCompatActivity implements BottomNavigation.OnMenu
             calificaciones.addAll(calificaciones_adapter.getDataSet());
             alumno_seleccionado.setCalificaciones((JsonArray) new Gson().toJsonTree(calificaciones, new TypeToken<List<Calificacion>>() {
             }.getType()));
-            //if (cant_np < calificaciones.size() ){
-            //  alumno_seleccionado.setPromedio(String.valueOf(promedio_general.get(0)));
-            //}else {
-            //alumno_seleccionado.setPromedio("NP");
-            //}
+            int cant_tot_np = 0;
+            double promedio_final_global = 0;
+            for (Calificacion calificacion : calificaciones) {
+                if (calificacion.getObtenido().equals("NP")) {
+                    cant_tot_np++;
+                } else {
+                    double obtenido = Double.parseDouble(calificacion.getObtenido());
+                    double valor = Double.parseDouble(calificacion.getValor_actividad());
+                    promedio_final_global += ((obtenido * valor) / 100);
+                }
+            }
+            if (cant_tot_np < calificaciones.size()) {
+                promedio_final_global /= 3;
+                alumno_seleccionado.setPromedio(String.format(Locale.getDefault(), "%.2f", promedio_final_global));
+            } else {
+                alumno_seleccionado.setPromedio("NP");
+            }
+
+
             alumnos.add(index, alumno_seleccionado);
             //Actualizacion de grupo
             index = grupos.indexOf(grupo_seleccionado);
