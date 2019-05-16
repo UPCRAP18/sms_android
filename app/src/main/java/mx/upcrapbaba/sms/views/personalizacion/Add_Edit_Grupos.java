@@ -3,6 +3,7 @@ package mx.upcrapbaba.sms.views.personalizacion;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,6 +18,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
@@ -44,6 +46,7 @@ import mx.upcrapbaba.sms.models.Calificacion;
 import mx.upcrapbaba.sms.models.Grupo;
 import mx.upcrapbaba.sms.models.User;
 import mx.upcrapbaba.sms.sqlite.DBHelper;
+import mx.upcrapbaba.sms.views.inicio.Inicio;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -263,7 +266,9 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
                 JsonArray alumnos_original = grupo_seleccionado.getAlumnos();
                 JsonArray alumnos_updated = (JsonArray) new Gson().toJsonTree(alumnos_to_add, new TypeToken<List<Alumno>>() {
                 }.getType());
-                alumnos_original.add(alumnos_updated.get(0));
+                for (JsonElement element : alumnos_updated) {
+                    alumnos_original.add(element);
+                }
                 grupo_seleccionado.setAlumnos(alumnos_original);
 
             }
@@ -459,6 +464,21 @@ public class Add_Edit_Grupos extends AppCompatActivity implements Alumnos_EditGr
         } else {
             Toasty.warning(Add_Edit_Grupos.this, getString(R.string.warn_nombre_grupo)).show();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(Add_Edit_Grupos.this, Inicio.class));
+        Add_Edit_Grupos.this.finish();
     }
 
     @Override

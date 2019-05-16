@@ -1,7 +1,9 @@
 package mx.upcrapbaba.sms.views.personalizacion;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -39,6 +41,7 @@ import mx.upcrapbaba.sms.models.Asignatura;
 import mx.upcrapbaba.sms.models.Grupo;
 import mx.upcrapbaba.sms.models.User;
 import mx.upcrapbaba.sms.sqlite.DBHelper;
+import mx.upcrapbaba.sms.views.inicio.Inicio;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -562,5 +565,22 @@ public class Add_Edit_Asignaturas extends AppCompatActivity implements Grupos_Ed
         isForUpdate = true;
 
     }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(Add_Edit_Asignaturas.this, Inicio.class));
+        Add_Edit_Asignaturas.this.finish();
+    }
+
 
 }

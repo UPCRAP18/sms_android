@@ -188,9 +188,21 @@ public class Estadisticas extends AppCompatActivity implements BottomNavigation.
                     double reprobados_final = (cant_reprobados * 100) / alumnos.size();
                     double np_final = (cant_np * 100) / alumnos.size();
 
-                    double promedio_final_aprobados = promedio_aprobados / cant_aprobados;
-                    double promedio_final_reprobados = promedio_reprobados / cant_reprobados;
-                    double promedio_final_general = (promedio_final_aprobados + promedio_final_reprobados) / alumnos.size();
+
+                    double promedio_final_aprobados = 0.0;
+                    double promedio_final_reprobados = 0.0;
+                    double promedio_final_general = 0.0;
+
+                    if (promedio_aprobados > 0) {
+                        promedio_final_aprobados = promedio_aprobados / cant_aprobados;
+                    } else {
+                        promedio_final_aprobados = 0.0;
+                    }
+                    if (promedio_reprobados > 0) {
+                        promedio_final_reprobados = promedio_reprobados / cant_reprobados;
+                    }
+
+                    promedio_final_general = (promedio_final_aprobados + promedio_final_reprobados) / alumnos.size();
 
                     setDataPorcentaje(aprobados_final, reprobados_final, np_final);
 

@@ -8,9 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
@@ -25,7 +22,7 @@ public class Asignaturas_General_Adapter extends ArrayAdapter {
     private Context mContext;
     private List<Asignatura> dataSet;
 
-    public Asignaturas_General_Adapter(@NonNull Context context, int resource, List<Asignatura> data) {
+    public Asignaturas_General_Adapter(Context context, int resource, List<Asignatura> data) {
         super(context, resource);
         this.mContext = context;
         this.dataSet = data;
@@ -36,9 +33,9 @@ public class Asignaturas_General_Adapter extends ArrayAdapter {
         return dataSet.size();
     }
 
-    @NonNull
+
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder mViewHolder = new ViewHolder();
         Asignatura asignatura_actual = dataSet.get(position);
         if (convertView == null) {
@@ -54,7 +51,7 @@ public class Asignaturas_General_Adapter extends ArrayAdapter {
 
         mViewHolder.txtNombre_Materia.setText(asignatura_actual.getNombre_materia());
         if (asignatura_actual.getImagen_materia().isEmpty() || asignatura_actual.getImagen_materia() == null) {
-            Glide.with(mContext).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(mContext.getDrawable(R.drawable.materia_holder)).into(mViewHolder.imgImagen_Materia);
+            Glide.with(mContext).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(mContext.getResources().getDrawable(R.drawable.materia_holder)).into(mViewHolder.imgImagen_Materia);
         } else {
             String url = new ApiWeb().getBASE_URL_GLITCH() + "/" + asignatura_actual.getImagen_materia();
             Glide.with(mContext).applyDefaultRequestOptions(RequestOptions.circleCropTransform()).load(url).into(mViewHolder.imgImagen_Materia);
@@ -64,7 +61,7 @@ public class Asignaturas_General_Adapter extends ArrayAdapter {
     }
 
     @Override
-    public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
         return getView(position, convertView, parent);
     }
 

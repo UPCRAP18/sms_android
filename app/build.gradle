@@ -10,6 +10,7 @@ android {
         versionName '2.1'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         versionNameSuffix = 'Release'
+        multiDexEnabled  true
     }
     buildTypes {
         release {
@@ -17,11 +18,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
     }
     buildToolsVersion = '28.0.3'
+}
+
+configurations {
+    compile.exclude group: 'androidx.annotation', module: 'annotation'
 }
 
 dependencies {
@@ -35,6 +41,7 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.android.support:multidex:1.0.3'
 
     //Externos
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'

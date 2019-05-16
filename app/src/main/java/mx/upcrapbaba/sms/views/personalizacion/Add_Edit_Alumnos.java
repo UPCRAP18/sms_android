@@ -1,7 +1,9 @@
 package mx.upcrapbaba.sms.views.personalizacion;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -35,6 +37,7 @@ import mx.upcrapbaba.sms.models.Asignatura;
 import mx.upcrapbaba.sms.models.Grupo;
 import mx.upcrapbaba.sms.models.User;
 import mx.upcrapbaba.sms.sqlite.DBHelper;
+import mx.upcrapbaba.sms.views.inicio.Inicio;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -269,6 +272,21 @@ public class Add_Edit_Alumnos extends AppCompatActivity {
         return (!etNombre_Alumno.getText().toString().trim().isEmpty() ||
                 !etMatricula_Alumno.getText().toString().trim().isEmpty() ||
                 !etApellidos_Alumno.getText().toString().trim().isEmpty());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(Add_Edit_Alumnos.this, Inicio.class));
+        Add_Edit_Alumnos.this.finish();
     }
 
 }
